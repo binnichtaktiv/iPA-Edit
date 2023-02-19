@@ -5,8 +5,6 @@ import shutil
  
 payload_name = "Payload.zip" 
 
-def make_zip():
-    gh
  
 def bundleID(): 
      
@@ -32,12 +30,20 @@ def bundleID():
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
  
-         
-    shutil.make_archive(payload_path, "zip", root_dir=payload_path) 
-         
-    os.rename("Payload.zip", file_name) 
-    os.remove(zip_path) 
-    shutil.rmtree(payload_path) 
+    output_path = input("\n\nenter the path where you want the edited .ipa:\n") 
+ 
+    output_path = os.path.join(output_path) 
+    with zipfile.ZipFile(os.path.join(output_path, "Payload.zip"), 'w', zipfile.ZIP_DEFLATED) as zip_file:  
+       for root, dirs, files in os.walk(payload_path): 
+           for file in files: 
+               file_path = os.path.join(root, file) 
+               zip_file.write(file_path, file_path.replace(payload_path, "Payload")) 
+                
+                
+    user_new_ipa_name = input(f"\n\nenter a new name for your edited .ipa\noriginal .ipa name: {file_name}'\n") 
+    os.rename(payload_path+".zip", user_new_ipa_name) 
+    edited_file_path = os.path.join(output_path, user_new_ipa_name)
+    os.replace(user_new_ipa_name, edited_file_path) 
  
     print("The bundle ID was changed successfully.") 
  
@@ -65,11 +71,20 @@ def changeName():
          plistlib.dump(pl, fp) 
  
          
-    shutil.make_archive(payload_path, "zip", root_dir=payload_path) 
-         
-    os.rename("Payload.zip", file_name) 
-    os.remove(zip_path) 
-    shutil.rmtree(payload_path) 
+    output_path = input("\n\nenter the path where you want the edited .ipa:\n") 
+ 
+    output_path = os.path.join(output_path) 
+    with zipfile.ZipFile(os.path.join(output_path, "Payload.zip"), 'w', zipfile.ZIP_DEFLATED) as zip_file:  
+       for root, dirs, files in os.walk(payload_path): 
+           for file in files: 
+               file_path = os.path.join(root, file) 
+               zip_file.write(file_path, file_path.replace(payload_path, "Payload")) 
+                
+                
+    user_new_ipa_name = input(f"\n\nenter a new name for your edited .ipa\noriginal .ipa name: {file_name}'\n") 
+    os.rename(payload_path+".zip", user_new_ipa_name) 
+    edited_file_path = os.path.join(output_path, user_new_ipa_name)
+    os.replace(user_new_ipa_name, edited_file_path)
  
     print("The App-Name was changed successfully.") 
  
@@ -121,6 +136,7 @@ def changeIcon():
     with open(plist_path, 'wb') as fp:
         plistlib.dump(plist, fp)
     
+    
     output_path = input("\n\nenter the path where you want the edited .ipa:\n") 
  
     output_path = os.path.join(output_path) 
@@ -134,8 +150,7 @@ def changeIcon():
     user_new_ipa_name = input(f"\n\nenter a new name for your edited .ipa\noriginal .ipa name: {file_name}'\n") 
     os.rename(payload_path+".zip", user_new_ipa_name) 
     edited_file_path = os.path.join(output_path, user_new_ipa_name)
-    os.replace(user_new_ipa_name, edited_file_path) 
- 
+    os.replace(user_new_ipa_name, edited_file_path)
      
     print("The App-Icon was changed successfully.") 
  
