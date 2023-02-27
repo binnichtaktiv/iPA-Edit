@@ -5,9 +5,11 @@ import shutil
 import pickle
 import subprocess
 import time
+import json
  
 payload_name = "Payload.zip" 
 filename = 'variable.pkl'
+data_file_path = "list_data.json"
 
 
 def clear_terminal():
@@ -71,6 +73,7 @@ print("[4] change App-Icon & App-Name")
 print("[5] change App Icon")
 print("[6] inject Satella Jailed")
 print("[7] inject .debs/.dylibs")
+print("[8] update modded apps")
  
 option = int(input("choose an option: \n"))
 clear_terminal() 
@@ -329,8 +332,97 @@ if option == 4:
     clear_terminal()
     print("The App Icon was changed successfully.")
     
+if option == 8:
+    
+    list_data = []
+    if os.path.exists(data_file_path):
+        with open(data_file_path, "r") as data_file:
+            list_data = json.load(data_file)
+
+    while True:
+        action = input(" what do you want to?\n [1] add a new app \n [2] remove an app \n [3] use an existing app \n [4] exit\n")
+        clear_terminal()
+
+        if action.lower() == "1":
+            clear_terminal()
+            name = input("Enter a name for the app you want to save the paths for: \n")
+            clear_terminal()
+
+            debs_paths = []
+            while True:
+                debs_path = input("Enter the deb path(s) for the new app, or type 'done' to finish: \n")
+                if debs_path.lower() == "done":
+                    clear_terminal()
+                    break
+                debs_paths.append(debs_path)
+                clear_terminal()
+
+            new_item = {
+                "name": name,
+                "debs_path": debs_paths,
+            }
+            list_data.append(new_item)
+            with open(data_file_path, "w") as data_file:
+                json.dump(list_data, data_file)
+
+        elif action.lower() == "2":
+            # Display list of items
+            print("List of items:")
+            for i, item in enumerate(list_data):
+                print(f"{i}: {item['name']}")
+
+            item_index = input("Enter the number of the app you want to remove: \n")
+            clear_terminal()
+            try:
+                item_index = int(item_index)
+                item = list_data[item_index]
+                del list_data[item_index]
+                print(f"App '{item['name']}' has been removed from the list.")
+                clear_terminal()
+            except:
+                clear_terminal()
+                print("Invalid input, please try again.")
+                
+
+            with open(data_file_path, "w") as data_file:
+                json.dump(list_data, data_file)
+                
+        elif action.lower() == "4":
+            exit()
+
+        elif action.lower() == "3":
+            print("List of items:")
+            for i, item in enumerate(list_data):
+                print(f"{i}: {item['name']}")
+
+            item_index = input("Enter the number of the item you want to use: \n")
+            clear_terminal()
+            try:
+                item_index = int(item_index)
+                item = list_data[item_index]
+                break
+            except:
+                clear_terminal()
+                print("Invalid input, please try again.")
+
+        else:
+            clear_terminal()
+            print("Invalid input, please try again.")
+
+    ipa_path_for_azulelist = input("Enter the iPA path to the new iPA: \n")
+    clear_terminal()
+    new_ipa_name = input("enter a name for the pathed iPA: \n")
+    clear_terminal()
+    output_path_azulelist = input("Enter a output path: \n ")
+    clear_terminal()
+
+    debs_paths_str = ' '.join(item['debs_path'])
+    command = f"azule -o '{output_path_azulelist}' -i '{ipa_path_for_azulelist}' -f {debs_paths_str} -z -n {new_ipa_name}"
+    os.system(command)
+    print("App was patched successfully.")
+
      
     
-if option > 7:
+if option > 8:
     print("not a valid option. Try again.")
     exit()
