@@ -25,7 +25,8 @@ def unzip_ipa(ipa_path):
     if os.path.exists(ipa_path):
         os.rename(ipa_path, zip_path)
         print("iPA file successfully renamed to .Zip")
-        time.sleep(3)
+        time.sleep(2)
+        clear_terminal()
     else:
         print("The .iPA file could not be found. Try again...")
         exit()
@@ -34,23 +35,31 @@ def unzip_ipa(ipa_path):
         zip_ref.extractall(os.path.dirname(zip_path))
 
     payload_path = os.path.join(os.path.dirname(zip_path), "Payload")
-    print(payload_path)
     app_folder = os.listdir(payload_path)[0]
     app_path = os.path.join(payload_path, app_folder)
-    return app_path, file_name_no_ipa, zip_path
+    return app_path, file_name_no_ipa, zip_path, payload_path
                                                                                 #zip iPA
-def zip_ipa(ipa_path, app_path, file_name_no_ipa):
-    zip_path = ipa_path.replace(".ipa", ".zip")
-    if os.path.exists(zip_path):
-        os.remove(zip_path)
-
-    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        for root, dirs, files in os.walk(app_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                zip_file.write(file_path, file_path.replace(app_path, ""))
-
-    os.rename(zip_path, file_name_no_ipa + ".ipa")
+def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
+    payload_path2 = payload_path
+    
+    if os.path.basename(payload_path2) == "Payload":
+        output_path = payload_path2[:len(payload_path2)-len("/Payload")]
+    else:
+        output_path = os.path.dirname(payload_path2)
+ 
+    output_path = os.path.join(output_path) 
+    with zipfile.ZipFile(os.path.join(output_path, "Payload.zip"), 'w', zipfile.ZIP_DEFLATED) as zip_file:  
+       for root, dirs, files in os.walk(payload_path): 
+           for file in files: 
+               file_path = os.path.join(root, file) 
+               zip_file.write(file_path, file_path.replace(payload_path, "Payload")) 
+                
+                
+    user_new_ipa_name = input(f"\n\nenter a new name for your edited .ipa (without the .ipa at the end) \noriginal .ipa name: {file_name_no_ipa}'\n") 
+    user_new_ipa_name = user_new_ipa_name.strip() + ".ipa"
+    os.rename(payload_path+".zip", user_new_ipa_name) 
+    edited_file_path = os.path.join(output_path, user_new_ipa_name)
+    os.replace(user_new_ipa_name, edited_file_path)
 
                                                                                             #start
                                                                                             
@@ -93,7 +102,7 @@ if option == 2:
     
     ipa_path = input("Please enter the path to the IPA file:\n ")
     clear_terminal()
-    app_path, file_name_no_ipa, zip_path = unzip_ipa(ipa_path)
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
     
     info_plist_path = os.path.join(app_path, "Info.plist") 
     with open(info_plist_path, 'rb') as fp: 
