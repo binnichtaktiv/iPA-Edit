@@ -15,5 +15,7 @@ can change Bundle-ID, App-Name and App-Icon - i will keep adding more
 
 [7] inject .debs/.dylibs
 
+[8] update modded apps
+
 
 run `python3 iPA Edit`in Terminal
