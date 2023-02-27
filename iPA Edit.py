@@ -25,7 +25,7 @@ def unzip_ipa(ipa_path):
     if os.path.exists(ipa_path):
         os.rename(ipa_path, zip_path)
         print("iPA file successfully renamed to .Zip")
-        time.sleep(2)
+        time.sleep(1)
         clear_terminal()
     else:
         print("The .iPA file could not be found. Try again...")
@@ -38,7 +38,7 @@ def unzip_ipa(ipa_path):
     app_folder = os.listdir(payload_path)[0]
     app_path = os.path.join(payload_path, app_folder)
     return app_path, file_name_no_ipa, zip_path, payload_path
-                                                                                #zip iPA
+
 def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
     payload_path2 = payload_path
     
@@ -54,10 +54,11 @@ def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
                file_path = os.path.join(root, file) 
                zip_file.write(file_path, file_path.replace(payload_path, "Payload")) 
                 
-                
-    user_new_ipa_name = input(f"\n\nenter a new name for your edited .ipa (without the .ipa at the end) \noriginal .ipa name: {file_name_no_ipa}'\n") 
+    clear_terminal()           
+    user_new_ipa_name = input(f"enter a new name for your edited .ipa (without the .ipa at the end) \noriginal .ipa name: {file_name_no_ipa}'\n") 
+    clear_terminal()
     user_new_ipa_name = user_new_ipa_name.strip() + ".ipa"
-    os.rename(payload_path+".zip", user_new_ipa_name) 
+    os.rename(os.path.join(output_path, "Payload.zip"), user_new_ipa_name) 
     edited_file_path = os.path.join(output_path, user_new_ipa_name)
     os.replace(user_new_ipa_name, edited_file_path)
 
@@ -66,9 +67,10 @@ def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
 print("[1] change Bundle-ID") 
 print("[2] change App-Name") 
 print("[3] change App-Version") 
-print("[4] change App-Icon")
-print("[5] inject Satella Jailed")
-print("[6] inject .debs/.dylibs")
+print("[4] change App-Icon & App-Name")
+print("[5] change App Icon")
+print("[6] inject Satella Jailed")
+print("[7] inject .debs/.dylibs")
  
 option = int(input("choose an option: \n"))
 clear_terminal() 
@@ -77,7 +79,7 @@ if option == 1:
     
     ipa_path = input("Please enter the path to the IPA file:\n ")
     clear_terminal()
-    app_path, file_name_no_ipa, zip_path = unzip_ipa(ipa_path)
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
  
     info_plist_path = os.path.join(app_path, "Info.plist") 
     with open(info_plist_path, 'rb') as fp: 
@@ -94,7 +96,7 @@ if option == 1:
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
     
-    zip_ipa(ipa_path, app_path, file_name_no_ipa)
+    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
     print("The Bundle ID was changed successfully.")
  
@@ -119,7 +121,7 @@ if option == 2:
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
          
-    zip_ipa(ipa_path, app_path, file_name_no_ipa)
+    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
     print("The App Name was changed successfully.")
     
@@ -127,7 +129,7 @@ if option == 3:
     
     ipa_path = input("Please enter the path to the IPA file:\n ")
     clear_terminal()
-    app_path, file_name_no_ipa, zip_path = unzip_ipa(ipa_path)
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
 
     info_plist_path = os.path.join(app_path, "Info.plist") 
     with open(info_plist_path, 'rb') as fp: 
@@ -144,15 +146,15 @@ if option == 3:
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
          
-    zip_ipa(ipa_path, app_path, file_name_no_ipa)
+    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
 
     print("The App Version was changed successfully.")
     
-if option == 4:
+if option == 5:
     
     ipa_path = input("Please enter the path to the IPA file:\n ")
     clear_terminal()
-    app_path, file_name_no_ipa, zip_path = unzip_ipa(ipa_path)
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
     
     directory = app_path # aktuellen ordner 
     for filename in os.listdir(directory): 
@@ -199,7 +201,7 @@ if option == 4:
     clear_terminal()
     print("The App Icon was changed successfully.")
     
-if option == 5:
+if option == 6:
 
     try:
         with open(filename, 'rb') as f:
@@ -231,7 +233,7 @@ if option == 5:
     clear_terminal()
     print(".iPA file with Satella injected should be here: " + satella_jailed_folder)
     
-if option == 6:
+if option == 7:
         
     azule_ipa_input = input("enter the path to the iPA you want to inject debs into: \n")
     clear_terminal()
@@ -262,6 +264,73 @@ if option == 6:
     clear_terminal()
     print("modified .iPA should be here:" + azule_ipa_output)
     
-if option > 6:
+if option == 4:
+    ipa_path = input("Please enter the path to the IPA file:\n ")
+    clear_terminal()
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
+    
+    info_plist_path = os.path.join(app_path, "Info.plist") 
+    with open(info_plist_path, 'rb') as fp: 
+            pl = plistlib.load(fp) 
+ 
+    old_display_name = pl['CFBundleDisplayName'] 
+    print("Current App-Name: ", old_display_name) 
+ 
+    new_display_name = input("\nPlease enter your new App-Name: \n")
+    clear_terminal() 
+    pl['CFBundleDisplayName'] = new_display_name 
+ 
+    with open(info_plist_path, 'wb') as fp: 
+         plistlib.dump(pl, fp)
+ 
+    with open(info_plist_path, 'wb') as fp: 
+         plistlib.dump(pl, fp) 
+         
+    directory = app_path  
+    for filename in os.listdir(directory): 
+        if filename.startswith("AppIcon") and filename.endswith(".png"): 
+            file_path = os.path.join(directory, filename) 
+            try: 
+                os.remove(file_path)
+                clear_terminal()
+                print(f"\nIcon '{filename}' deleted successfully.") 
+                clear_terminal()
+            except Exception as e: 
+                print(f"\nError deleting file '{filename}': {e}") 
+                 
+    icon_path = input("Enter the path to the .png you want to use as App-Icon:\n")
+    clear_terminal()
+    print("Patching.... Pls wait") 
+     
+    with open(icon_path, 'rb') as fp:
+        png_content = fp.read()
+
+    for size in [(20, 20), (29, 29), (40, 40)]:
+        filename = f"AppIcon{size[0]}x{size[1]}.png"
+        target_path = os.path.join(app_path, filename)
+        with open(target_path, 'wb') as fp:
+            fp.write(png_content)
+
+    plist_path = os.path.join(app_path, "Info.plist")
+    
+    with open(plist_path, 'rb') as fp:
+        plist = plistlib.load(fp)
+
+    for key in list(plist.keys()):
+        if 'Icon' in key:
+            del plist[key]
+            
+    plist['CFBundleIconFiles'] = ['AppIcon20x20', 'AppIcon29x29', 'AppIcon40x40']
+
+    with open(plist_path, 'wb') as fp:
+        plistlib.dump(plist, fp)
+        
+    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
+    clear_terminal()
+    print("The App Icon was changed successfully.")
+    
+     
+    
+if option > 7:
     print("not a valid option. Try again.")
     exit()
