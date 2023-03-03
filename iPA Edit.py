@@ -10,6 +10,7 @@ import json
 payload_name = "Payload.zip" 
 filename = 'variable.pkl'
 data_file_path = "list_data.json"
+sideload_detection_paths = 'sideload_detection_paths.pkl'
 
 
 def clear_terminal():
@@ -72,10 +73,11 @@ print("[3] change App-Version")
 print("[4] change App-Icon & App-Name")
 print("[5] change App Icon")
 print("[6] inject Satella Jailed")
-print("[7] inject .debs/.dylibs")
-print("[8] update modded apps")
+print("[7] inject Sideload Detection Bypass ")
+print("[8] inject .debs/.dylibs")
+print("[9] update modded apps")
  
-option = int(input("choose an option: \n"))
+option = int(input("Choose an option: \n"))
 clear_terminal() 
  
 if option == 1: 
@@ -89,9 +91,9 @@ if option == 1:
             pl = plistlib.load(fp) 
  
     old_bundle_id = pl['CFBundleIdentifier'] 
-    print("current Bundle-ID: ", old_bundle_id) 
+    print("Current Bundle-ID: ", old_bundle_id) 
  
-    new_bundle_id = input("\nplease enter your new Bundle-ID: \n") 
+    new_bundle_id = input("\nPlease enter your new Bundle-ID: \n") 
     clear_terminal()
     pl['CFBundleIdentifier'] = new_bundle_id
     print("Patching.... Pls wait")
@@ -114,9 +116,9 @@ if option == 2:
             pl = plistlib.load(fp) 
  
     old_display_name = pl['CFBundleDisplayName'] 
-    print("current App-Name: ", old_display_name) 
+    print("Current App-Name: ", old_display_name) 
  
-    new_display_name = input("please enter your new App-Name: \n")
+    new_display_name = input("Please enter your new App-Name: \n")
     clear_terminal() 
     pl['CFBundleDisplayName'] = new_display_name 
     print("Patching.... Pls wait")
@@ -139,9 +141,9 @@ if option == 3:
             pl = plistlib.load(fp) 
  
     old_version = pl['CFBundleShortVersionString'] 
-    print("\ncurrent App-Version: ", old_version) 
+    print("\nCurrent App-Version: ", old_version) 
  
-    new_version = input("\nplease enter your new App-Version: \n")
+    new_version = input("\nPlease enter your new App-Version: \n")
     clear_terminal()
     pl['CFBundleShortVersionString'] = new_version
     print("Patching.... Pls wait") 
@@ -202,7 +204,7 @@ if option == 5:
         
     zip_ipa(ipa_path, app_path, file_name_no_ipa)
     clear_terminal()
-    print("The App Icon was changed successfully.")
+    print("App Icon was changed successfully.")
     
 if option == 6:
 
@@ -210,15 +212,15 @@ if option == 6:
         with open(filename, 'rb') as f:
             satella_jailed_folder = pickle.load(f)
     except FileNotFoundError:
-        satella_jailed_folder = input("enter the folder where Satella Jailed was downloaded: \n")
+        satella_jailed_folder = input("Enter the folder where Satella Jailed was downloaded: \n")
         clear_terminal()
         with open(filename, 'wb') as f:
             pickle.dump(satella_jailed_folder, f)
-        print('created permanent variable for your Satella path.\n')
+        print('Created permanent variable for your Satella path.\n')
         time.sleep(4)
         clear_terminal()
 
-    ipa_path = input("enter the path of the .iPA you want to inject Satella to: \n")
+    ipa_path = input("Enter the path of the .iPA you want to inject Satella to: \n")
     clear_terminal()
     shutil.copy(ipa_path, satella_jailed_folder)
     os.chdir(satella_jailed_folder)
@@ -236,25 +238,25 @@ if option == 6:
     clear_terminal()
     print(".iPA file with Satella injected should be here: " + satella_jailed_folder)
     
-if option == 7:
+if option == 8:
         
-    azule_ipa_input = input("enter the path to the iPA you want to inject debs into: \n")
+    azule_ipa_input = input("Enter the path to the iPA you want to inject debs into: \n")
     clear_terminal()
     if os.path.isfile(azule_ipa_input):
         print(".iPA file exists.\n\n")
         time.sleep(4)
         clear_terminal()
     else:
-        print("couldnt find .iPA file. Try again.")
+        print("Couldnt find .iPA file. Try again.")
         exit()
         
-    azule_ipa_output = input("enter the output path for your modified .iPA: \n")
+    azule_ipa_output = input("Enter the output path for your modified .iPA: \n")
     clear_terminal()
-    azule_ipa_output_name = input("enter new name for the modified .iPA (without the .iPA at the end)\n")
+    azule_ipa_output_name = input("Enter new name for the modified .iPA (without the .iPA at the end)\n")
     clear_terminal()
     file_paths = []
     while True:
-        path = input("enter path of the deb you want to inject (type 'ready' if you are done) \n")
+        path = input("Enter path of the deb you want to inject (type 'ready' if you are done) \n")
         if path == "done":
             break
         clear_terminal()
@@ -265,7 +267,7 @@ if option == 7:
 
     subprocess.run(terminal_command, shell=True)
     clear_terminal()
-    print("modified .iPA should be here:" + azule_ipa_output)
+    print("Modified .iPA should be here:" + azule_ipa_output)
     
 if option == 4:
     ipa_path = input("Please enter the path to the IPA file:\n ")
@@ -332,7 +334,7 @@ if option == 4:
     clear_terminal()
     print("The App Icon was changed successfully.")
     
-if option == 8:
+if option == 9:
     
     list_data = []
     if os.path.exists(data_file_path):
@@ -340,7 +342,7 @@ if option == 8:
             list_data = json.load(data_file)
 
     while True:
-        action = input(" what do you want to?\n [1] add a new app \n [2] remove an app \n [3] use an existing app \n [4] exit\n")
+        action = input("What do you want to?\n [1] add a new app \n [2] remove an app \n [3] use an existing app \n [4] exit\n")
         clear_terminal()
 
         if action.lower() == "1":
@@ -411,7 +413,7 @@ if option == 8:
 
     ipa_path_for_azulelist = input("Enter the iPA path to the new iPA: \n")
     clear_terminal()
-    new_ipa_name = input("enter a name for the pathed iPA: \n")
+    new_ipa_name = input("Enter a name for the patched iPA: \n")
     clear_terminal()
     output_path_azulelist = input("Enter a output path: \n ")
     clear_terminal()
@@ -421,8 +423,64 @@ if option == 8:
     os.system(command)
     print("App was patched successfully.")
 
-     
+if option == 7:
+    with open('sideload_detection_paths.pkl', 'rb') as f:
+        sideload_detection_paths = pickle.load(f)
+
+    # Überprüfen, ob sideload_detection_paths ein Dictionary ist
+    if isinstance(sideload_detection_paths, dict):
+        # Lesen der Variablen aus dem Dictionary
+        sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
+        sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
+        sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
+    else:
+        # Wenn sideload_detection_paths kein Dictionary ist, Variablen neu eingeben
+        sideload_bypass1 = input("Enter the path of 'Sideloadbypass1.dylib'\n")
+        clear_terminal()
+        sideload_bypass2 = input("Enter the path of 'Sideloadbypass2.dylib'\n")
+        clear_terminal()
+        sideloadly_bypass = input("Enter the path of 'SideloadDetection-05/6.dylib'\n")
+        clear_terminal()
+        # Erstellen des Dictionaries und Schreiben in die Datei
+        sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
+                                    'sideload_bypass2': sideload_bypass2,
+                                    'sideloadly_bypass': sideloadly_bypass}
+        with open('sideload_detection_paths.pkl', 'wb') as f:
+            pickle.dump(sideload_detection_paths, f)    
+                
+            print("Permanently saved the paths to the sideload detection bypass .dylibs do you dont have to enter them everytime..")
+            time.sleep(3)
+        
+    sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
+    clear_terminal()
+    sideload_detection_bypass_ipa_output = input("Enter a output path:\n")
+    clear_terminal()
+    sideload_detection_bypass_ipa_output_name = input("Enter a name for the patched iPA:\n")
+    clear_terminal()
     
-if option > 8:
-    print("not a valid option. Try again.")
+    bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n"))
+    clear_terminal()
+    
+    if bypass_selection == 1:
+        azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
+        azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
+        subprocess.run(azule_cmd, shell=True)
+        clear_terminal()
+        print("modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
+        
+    elif bypass_selection == 2:
+        azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
+        subprocess.run(azule_cmd, shell=True)
+        clear_terminal()
+        print("modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
+        
+    else:
+        print("Not a valid option... Try again")
+        exit()
+
+    
+    
+    
+if option > 9:
+    print("Not a valid option. Try again.")
     exit()
