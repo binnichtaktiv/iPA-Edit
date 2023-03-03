@@ -13,9 +13,11 @@ can change Bundle-ID, App-Name and App-Icon - i will keep adding more
 
 [6] inject Satella Jailed
 
-[7] inject .debs/.dylibs
+[7] inject Sideload Detection Bypass
 
-[8] update modded apps
+[8] inject .debs/.dylibs
+
+[9] update modded apps
 
 
 run `python3 iPA Edit`in Terminal
