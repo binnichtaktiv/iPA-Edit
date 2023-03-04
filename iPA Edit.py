@@ -6,6 +6,7 @@ import pickle
 import subprocess
 import time
 import json
+import requests
  
 payload_name = "Payload.zip" 
 filename = 'variable.pkl'
@@ -67,6 +68,7 @@ def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
 
                                                                                             #start
                                                                                             
+print("\n[0] download iPAs via direct URL")
 print("[1] change Bundle-ID") 
 print("[2] change App-Name") 
 print("[3] change App-Version") 
@@ -477,6 +479,29 @@ if option == 7:
     else:
         print("Not a valid option... Try again")
         exit()
+        
+if option == 0:
+    url = input("enter a direct download URL: ")
+    os.system('clear')
+    filename = input("enter a name for the downloaded file:")
+    os.system('clear')
+
+    response = requests.get(url, stream=True)
+    total_size = int(response.headers.get("content-length", 0))
+    block_size = 1024
+    downloaded_size = 0
+
+    with open(filename, "wb") as f:
+        for data in response.iter_content(block_size):
+            downloaded_size += len(data)
+            f.write(data)
+            progress = downloaded_size / total_size * 100
+            print(f"Download Fortschritt: {progress:.2f}%", end="\r")
+
+    if total_size != 0 and downloaded_size != total_size:
+        print("failed to download.")
+    else:
+        print(f"{filename} was downloaded successfully.")
 
     
     
