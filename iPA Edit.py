@@ -426,24 +426,18 @@ if option == 9:
     print("App was patched successfully.")
 
 if option == 7:
-    with open('sideload_detection_paths.pkl', 'rb') as f:
-        sideload_detection_paths = pickle.load(f)
+    try:
+        with open('sideload_detection_paths.pkl', 'rb') as f:
+            sideload_detection_paths = pickle.load(f)
 
-    # Überprüfen, ob sideload_detection_paths ein Dictionary ist
-    if isinstance(sideload_detection_paths, dict):
-        # Lesen der Variablen aus dem Dictionary
-        sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
-        sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
-        sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
-    else:
-        # Wenn sideload_detection_paths kein Dictionary ist, Variablen neu eingeben
+    except FileNotFoundError:
+            
         sideload_bypass1 = input("Enter the path of 'Sideloadbypass1.dylib'\n")
         clear_terminal()
         sideload_bypass2 = input("Enter the path of 'Sideloadbypass2.dylib'\n")
         clear_terminal()
         sideloadly_bypass = input("Enter the path of 'SideloadDetection-05/6.dylib'\n")
         clear_terminal()
-        # Erstellen des Dictionaries und Schreiben in die Datei
         sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
                                     'sideload_bypass2': sideload_bypass2,
                                     'sideloadly_bypass': sideloadly_bypass}
@@ -452,6 +446,9 @@ if option == 7:
                 
             print("Permanently saved the paths to the sideload detection bypass .dylibs do you dont have to enter them everytime..")
             time.sleep(3)
+            sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
+            sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
+            sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
         
     sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
     clear_terminal()
