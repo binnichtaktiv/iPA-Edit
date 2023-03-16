@@ -19,5 +19,7 @@ can change Bundle-ID, App-Name and App-Icon - i will keep adding more
 
 [9] update modded apps
 
+[10] export .dylib(s) of an iPA
+
 
 run `python3 iPA Edit`in Terminal
