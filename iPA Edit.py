@@ -78,7 +78,7 @@ print("[6] inject Satella Jailed")
 print("[7] inject Sideload Detection Bypass ")
 print("[8] inject .debs/.dylibs")
 print("[9] update modded apps")
-print("[10] export .dylibs of an iPA")
+print("[10] export .dylib(s) of an iPA")
  
 option = int(input("Choose an option: \n"))
 clear_terminal() 
@@ -106,6 +106,8 @@ if option == 1:
     
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
+    shutil.rmtree(payload_path)
+    os.remove(zip_path)
     print("The Bundle ID was changed successfully.")
  
 if option == 2: 
@@ -131,6 +133,8 @@ if option == 2:
          
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
+    shutil.rmtree(payload_path)
+    os.remove(zip_path)
     print("The App Name was changed successfully.")
     
 if option == 3:
@@ -155,7 +159,8 @@ if option == 3:
          plistlib.dump(pl, fp) 
          
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
-
+    shutil.rmtree(payload_path)
+    os.remove(zip_path)
     print("The App Version was changed successfully.")
     
 if option == 5:
@@ -207,6 +212,8 @@ if option == 5:
         
     zip_ipa(ipa_path, app_path, file_name_no_ipa)
     clear_terminal()
+    shutil.rmtree(payload_path)
+    os.remove(zip_path)
     print("App Icon was changed successfully.")
     
 if option == 6:
@@ -335,6 +342,8 @@ if option == 4:
         
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
+    shutil.rmtree(payload_path)
+    os.remove(zip_path)
     print("The App Icon was changed successfully.")
     
 if option == 9:
