@@ -546,7 +546,7 @@ if option == 10:
     for file in selected_dylib_files:
         shutil.copy(file, export_path)
 
-    print('Exported .dylibs successfullyy')
+    print('Exported .dylibs successfully')
 
     if option == 11:
         clear_terminal()
