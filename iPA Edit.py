@@ -79,6 +79,7 @@ print("[7] inject Sideload Detection Bypass ")
 print("[8] inject .debs/.dylibs")
 print("[9] update modded apps")
 print("[10] export .dylib(s) of an iPA")
+print("[11] exit")
  
 option = int(input("Choose an option: \n"))
 clear_terminal() 
@@ -545,9 +546,12 @@ if option == 10:
     for file in selected_dylib_files:
         shutil.copy(file, export_path)
 
-    print('Exported .dylibs successfully')
-    
+    print('Exported .dylibs successfullyy')
 
-if option > 10:
+    if option == 11:
+        clear_terminal()
+        exit()    
+
+if option > 11:
     print("Not a valid option. Try again.")
     exit()
