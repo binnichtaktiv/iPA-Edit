@@ -21,6 +21,7 @@ can change Bundle-ID, App-Name and App-Icon - i will keep adding more
 
 [10] export .dylib(s) of an iPA
 
+[11] change .dylib dependency
 
 run `python3 iPA Edit.py`in Terminal
 
