@@ -507,46 +507,58 @@ if option == 0:
 if option == 10:
 
     file_path = input("Enter path to .dylib: ")
-
-    dep_option = int(input("What do you want to change? \n [1] @rpath/CydiaSubstrate.framework/CydiaSubstrate \n [2] other dependency"))
-
-    if dep_option == 1:
-
-        old_word = "@rpath/CydiaSubstrate.framework/CydiaSubstrate"
-
-        with open(file_path, 'rb') as file:
-            content = file.read()
-
-        index = content.find(old_word.encode())
-
-        while index != -1:
-            new_word = input("Enter new value for '{}' : ".format(old_word))
-            content = content[:index] + new_word.encode() + content[index+len(old_word.encode()):]
-            index = content.find(old_word.encode(), index + len(new_word.encode()))
-
-            with open(file_path, 'wb') as file:
-                file.write(content)
-
-        print("Changed dependency successfully.")
-    else:
-        old_word = input("Enter the path of the dependency you want to change\n Example: '/usr/lib/libSystem.B.dylib'")
-        with open(file_path, 'rb') as file:
-            content = file.read()
-
-        index = content.find(old_word.encode())
-
-        new_word = input("Enter new value for '{}' : ".format(old_word))
-
-        while index != -1:
-
-            content = content[:index] + new_word.encode() + content[index+len(old_word.encode()):]
-            index = content.find(old_word.encode(), index + len(new_word.encode()))
-
-            with open(file_path, 'wb') as file:
-                file.write(content)
-
-        print("Changed dependency successfully.")   
     
+    if file_path.endswith(".deb"):
+        print("You have to extract the .deb! Extract it and try with the .dylib again")
+        exit()
+        
+    if file_path.endswith(".dylib"):
+        clear_terminal()
+        dep_option = int(input("What do you want to change? \n [1] @rpath/CydiaSubstrate.framework/CydiaSubstrate \n [2] other dependency \n"))
+
+        if dep_option == 1:
+            clear_terminal()
+            old_word = "@rpath/CydiaSubstrate.framework/CydiaSubstrate"
+
+            with open(file_path, 'rb') as file:
+                content = file.read()
+
+            index = content.find(old_word.encode())
+
+            while index != -1:
+                new_word = input("Enter new value for '{}' : ".format(old_word))
+                content = content[:index] + new_word.encode() + content[index+len(old_word.encode()):]
+                index = content.find(old_word.encode(), index + len(new_word.encode()))
+
+                with open(file_path, 'wb') as file:
+                    file.write(content)
+            clear_terminal()
+            print("Changed dependency successfully.")
+        else:
+            clear_terminal()
+            old_word = input("Enter the path of the dependency you want to change\n Example: '@executable_path/tweak.dylib' \n ")
+            with open(file_path, 'rb') as file:
+                content = file.read()
+
+            index = content.find(old_word.encode())
+            clear_terminal()
+            new_word = input("Enter new value for '{}' : ".format(old_word))
+
+            while index != -1:
+
+                content = content[:index] + new_word.encode() + content[index+len(old_word.encode()):]
+                index = content.find(old_word.encode(), index + len(new_word.encode()))
+
+                with open(file_path, 'wb') as file:
+                    file.write(content)
+            clear_terminal()
+            print("Changed dependency successfully.")
+            
+    else:
+        print("This is not a .dylib file! Try again")
+        exit()
+        
+        
 if option > 10:
     print("Not a valid option. Try again.")
     exit()
