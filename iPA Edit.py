@@ -78,7 +78,8 @@ print("[6] inject Satella Jailed")
 print("[7] inject Sideload Detection Bypass ")
 print("[8] inject .debs/.dylibs")
 print("[9] update modded apps")
-print("[10] change .dylib dependency")
+print("[10] export .dylib(s) of an iPA")
+print("[11] change .dylib dependency")
  
 option = int(input("Choose an option: \n"))
 clear_terminal() 
@@ -504,7 +505,7 @@ if option == 0:
         print(f"{filename} was downloaded successfully.")
 
     
-if option == 10:
+if option == 11:
 
     file_path = input("Enter path to .dylib: ")
     
@@ -559,6 +560,44 @@ if option == 10:
         exit()
         
         
-if option > 10:
+
+if option == 10:
+
+
+    ipa_path = input("Please enter the path to the IPA file:\n ")
+    clear_terminal()
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
+
+    dylib_files = []
+    for root, _, files in os.walk(ipa_path):
+        for file in files:
+            if file.endswith('.dylib'):
+                dylib_files.append(os.path.join(root, file))
+
+    if not dylib_files:
+        print("Error: No .dylib files found in the IPA file.")
+        exit()
+
+    print('found .dylibs:')
+    for index, file in enumerate(dylib_files, start=1):
+        print(f'{index}: {os.path.basename(file)}')
+
+    clear_terminal()
+    selected_files = input('Enter the numbers of the files to be exported separated by commas: ')
+    clear_terminal()
+    selected_indices = [int(num.strip()) - 1 for num in selected_files.split(',')]
+    selected_dylib_files = [dylib_files[index] for index in selected_indices]
+
+    export_path = input('Enter a output path\n: ')
+    clear_terminal()
+    if not os.path.exists(export_path):
+        os.makedirs(export_path)
+
+    for file in selected_dylib_files:
+        shutil.copy(file, export_path)
+
+    print('Exported .dylibs successfully')
+    
+if option > 11:
     print("Not a valid option. Try again.")
     exit()
