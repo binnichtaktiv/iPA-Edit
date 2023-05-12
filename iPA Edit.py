@@ -213,68 +213,82 @@ if option == 5:
     print("App Icon was changed successfully.")
     
 if option == 6:
-
+    program = "azule"
     try:
-        with open(filename, 'rb') as f:
-            satella_jailed_folder = pickle.load(f)
-    except FileNotFoundError:
-        satella_jailed_folder = input("Enter the folder where Satella Jailed was downloaded: \n")
-        clear_terminal()
-        with open(filename, 'wb') as f:
-            pickle.dump(satella_jailed_folder, f)
-        print('Created permanent variable for your Satella path.\n')
-        time.sleep(4)
-        clear_terminal()
+        result = subprocess.run([program, "-h"], capture_output=True, text=True)
+        if result.returncode == 0:
+            try:
+                with open(filename, 'rb') as f:
+                    satella_jailed_folder = pickle.load(f)
+            except FileNotFoundError:
+                satella_jailed_folder = input("Enter the folder where Satella Jailed was downloaded: \n")
+                clear_terminal()
+                with open(filename, 'wb') as f:
+                    pickle.dump(satella_jailed_folder, f)
+                print('Created permanent variable for your Satella path.\n')
+                time.sleep(4)
+                clear_terminal()
 
-    ipa_path = input("Enter the path of the .iPA you want to inject Satella to: \n")
-    clear_terminal()
-    shutil.copy(ipa_path, satella_jailed_folder)
-    os.chdir(satella_jailed_folder)
-    patchsh_path = satella_jailed_folder + "/patch.sh"
-    print("Patching.... Pls wait a few seconds\n")
-    #subprocess.run("chmod +x " + patchsh_path)
-    process = subprocess.Popen(['sh', 'patch.sh'], stdout=subprocess.PIPE, text=True)
-    while True:
-        output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
-            break
-        if output:
-            print(output.strip())
-    process.communicate()
-    clear_terminal()
-    print(".iPA file with Satella injected should be here: " + satella_jailed_folder)
+            ipa_path = input("Enter the path of the .iPA you want to inject Satella to: \n")
+            clear_terminal()
+            shutil.copy(ipa_path, satella_jailed_folder)
+            os.chdir(satella_jailed_folder)
+            patchsh_path = satella_jailed_folder + "/patch.sh"
+            print("Patching.... Pls wait a few seconds\n")
+            #subprocess.run("chmod +x " + patchsh_path)
+            process = subprocess.Popen(['sh', 'patch.sh'], stdout=subprocess.PIPE, text=True)
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    break
+                if output:
+                    print(output.strip())
+            process.communicate()
+            clear_terminal()
+            print(".iPA file with Satella injected should be here: " + satella_jailed_folder)
+        else:
+            print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+    except FileNotFoundError:
+        print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
     
 if option == 8:
-        
-    azule_ipa_input = input("Enter the path to the iPA you want to inject debs into: \n")
-    clear_terminal()
-    if os.path.isfile(azule_ipa_input):
-        print(".iPA file exists.\n\n")
-        time.sleep(4)
-        clear_terminal()
-    else:
-        print("Couldnt find .iPA file. Try again.")
-        exit()
-        
-    azule_ipa_output = input("Enter the output path for your modified .iPA: \n")
-    clear_terminal()
-    azule_ipa_output_name = input("Enter new name for the modified .iPA (without the .iPA at the end)\n")
-    clear_terminal()
-    file_paths = []
-    while True:
-        path = input("Enter path of the deb you want to inject (type 'ready' if you are done) \n")
-        if path == "done":
-            break
-        clear_terminal()
-        file_paths.append(path)
+    program = "azule"
+    try:
+        result = subprocess.run([program, "-h"], capture_output=True, text=True)
+        if result.returncode == 0:
+            azule_ipa_input = input("Enter the path to the iPA you want to inject debs into: \n")
+            clear_terminal()
+            if os.path.isfile(azule_ipa_input):
+                print(".iPA file exists.\n\n")
+                time.sleep(4)
+                clear_terminal()
+            else:
+                print("Couldnt find .iPA file. Try again.")
+                exit()
 
-    deb_paths = " ".join(file_paths)
-    terminal_command = f"azule -o '{azule_ipa_output}' -i '{azule_ipa_input}' -f '{deb_paths}' -z -n '{azule_ipa_output_name}'"
+            azule_ipa_output = input("Enter the output path for your modified .iPA: \n")
+            clear_terminal()
+            azule_ipa_output_name = input("Enter new name for the modified .iPA (without the .iPA at the end)\n")
+            clear_terminal()
+            file_paths = []
+            while True:
+                path = input("Enter path of the deb you want to inject (type 'ready' if you are done) \n")
+                if path == "done":
+                    break
+                clear_terminal()
+                file_paths.append(path)
 
-    subprocess.run(terminal_command, shell=True)
-    clear_terminal()
-    print("Modified .iPA should be here:" + azule_ipa_output)
-    
+            deb_paths = " ".join(file_paths)
+            terminal_command = f"azule -o '{azule_ipa_output}' -i '{azule_ipa_input}' -f '{deb_paths}' -z -n '{azule_ipa_output_name}'"
+
+            subprocess.run(terminal_command, shell=True)
+            clear_terminal()
+            print("Modified .iPA should be here:" + azule_ipa_output)
+        else:
+            print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+    except FileNotFoundError:
+        print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+        
 if option == 4:
     ipa_path = input("Please enter the path to the IPA file:\n ")
     clear_terminal()
@@ -340,8 +354,9 @@ if option == 4:
     clear_terminal()
     print("The App Icon was changed successfully.")
     
+
 if option == 9:
-    
+    data_file_path = "azulelist_data.json"
     list_data = []
     if os.path.exists(data_file_path):
         with open(data_file_path, "r") as data_file:
@@ -428,58 +443,66 @@ if option == 9:
     command = f"azule -o '{output_path_azulelist}' -i '{ipa_path_for_azulelist}' -f {debs_paths_str} -z -n {new_ipa_name}"
     os.system(command)
     print("App was patched successfully.")
-
+    
+    
 if option == 7:
+    program = "azule"
     try:
-        with open('sideload_detection_paths.pkl', 'rb') as f:
-            sideload_detection_paths = pickle.load(f)
+        result = subprocess.run([program, "-h"], capture_output=True, text=True)
+        if result.returncode == 0:
+            try:
+                with open('sideload_detection_paths.pkl', 'rb') as f:
+                    sideload_detection_paths = pickle.load(f)
 
-    except FileNotFoundError:
+            except FileNotFoundError:
+                sideload_bypass1 = input("Enter the path of 'Sideloadbypass1.dylib'\n")
+                clear_terminal()
+                sideload_bypass2 = input("Enter the path of 'Sideloadbypass2.dylib'\n")
+                clear_terminal()
+                sideloadly_bypass = input("Enter the path of 'SideloadDetection-05/6.dylib'\n")
+                clear_terminal()
+                sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
+                                            'sideload_bypass2': sideload_bypass2,
+                                            'sideloadly_bypass': sideloadly_bypass}
+                with open('sideload_detection_paths.pkl', 'wb') as f:
+                    pickle.dump(sideload_detection_paths, f)    
+                    
+                print("Permanently saved the paths to the sideload detection bypass .dylibs so you don't have to enter them everytime..")
+                time.sleep(3)
+                sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
+                sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
+                sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
             
-        sideload_bypass1 = input("Enter the path of 'Sideloadbypass1.dylib'\n")
-        clear_terminal()
-        sideload_bypass2 = input("Enter the path of 'Sideloadbypass2.dylib'\n")
-        clear_terminal()
-        sideloadly_bypass = input("Enter the path of 'SideloadDetection-05/6.dylib'\n")
-        clear_terminal()
-        sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
-                                    'sideload_bypass2': sideload_bypass2,
-                                    'sideloadly_bypass': sideloadly_bypass}
-        with open('sideload_detection_paths.pkl', 'wb') as f:
-            pickle.dump(sideload_detection_paths, f)    
-                
-            print("Permanently saved the paths to the sideload detection bypass .dylibs do you dont have to enter them everytime..")
-            time.sleep(3)
-            sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
-            sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
-            sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
+            sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
+            clear_terminal()
+            sideload_detection_bypass_ipa_output = input("Enter an output path:\n")
+            clear_terminal()
+            sideload_detection_bypass_ipa_output_name = input("Enter a name for the patched iPA:\n")
+            clear_terminal()
         
-    sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
-    clear_terminal()
-    sideload_detection_bypass_ipa_output = input("Enter a output path:\n")
-    clear_terminal()
-    sideload_detection_bypass_ipa_output_name = input("Enter a name for the patched iPA:\n")
-    clear_terminal()
-    
-    bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n"))
-    clear_terminal()
-    
-    if bypass_selection == 1:
-        azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
-        azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-        subprocess.run(azule_cmd, shell=True)
-        clear_terminal()
-        print("modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
+            bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n"))
+            clear_terminal()
         
-    elif bypass_selection == 2:
-        azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
-        subprocess.run(azule_cmd, shell=True)
-        clear_terminal()
-        print("modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
-        
-    else:
-        print("Not a valid option... Try again")
-        exit()
+            if bypass_selection == 1:
+                azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
+                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(azule_cmd, shell=True)
+                clear_terminal()
+                print("Modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
+            
+            elif bypass_selection == 2:
+                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(azule_cmd, shell=True)
+                clear_terminal()
+                print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
+            
+            else:
+                print("Not a valid option... Try again")
+                exit()
+        else:
+            print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+    except FileNotFoundError:
+        print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
         
 if option == 0:
     url = input("enter a direct download URL: ")
