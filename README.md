@@ -1,5 +1,5 @@
 # iPA-Edit
-can change Bundle-ID, App-Name and App-Icon - i will keep adding more
+can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sideload Detection Bypass,  inject .debs/.dylibs,  update modded apps,  export .dylib(s) of an iPA, change .dylib dependency - i will keep adding more
 
 [1] change Bundle-ID
 
@@ -23,6 +23,9 @@ can change Bundle-ID, App-Name and App-Icon - i will keep adding more
 
 [11] change .dylib dependency
 
+
 run `python3 iPA Edit.py`in Terminal
 
 you have to install azule, Satella etc manually 
+
+You can put the .py file in your home folder or user folder so that you can just do `python(3) "iPA Edit.py"` 
