@@ -39,9 +39,21 @@ def unzip_ipa(ipa_path):
         zip_ref.extractall(os.path.dirname(zip_path))
 
     payload_path = os.path.join(os.path.dirname(zip_path), "Payload")
-    app_folder = os.listdir(payload_path)[0]
+
+    app_folder = None
+    for item in os.listdir(payload_path):
+        if item.endswith(".app"):
+            app_folder = item
+            break
+
+    if app_folder is None:
+        print("App folder not found. Try it again...")
+        exit()
+
     app_path = os.path.join(payload_path, app_folder)
     return app_path, file_name_no_ipa, zip_path, payload_path
+
+                                                                                #zip iPA
 
 def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
     payload_path2 = payload_path
@@ -65,8 +77,10 @@ def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
     os.rename(os.path.join(output_path, "Payload.zip"), user_new_ipa_name) 
     edited_file_path = os.path.join(output_path, user_new_ipa_name)
     os.replace(user_new_ipa_name, edited_file_path)
+    shutil.rmtree(payload_path)
+    os.remove(zip_path)
 
-                                                                                            #start
+                                                                                #start
                                                                                             
 print("\n[0] download iPAs via direct URL")
 print("[1] change Bundle-ID") 
