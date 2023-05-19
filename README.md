@@ -24,6 +24,8 @@ can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sidel
 [11] change .dylib dependency
 
 
+run `pip(3) install requests` first
+
 run `python3 iPA Edit.py`in Terminal
 
 you have to install azule, Satella etc manually 
