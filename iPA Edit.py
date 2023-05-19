@@ -15,10 +15,31 @@ sideload_detection_paths = 'sideload_detection_paths.pkl'
 
 
 def clear_terminal():
-    if os.name == 'nt': # Windows
-        os.system('cls')
-    elif os.name == 'posix': # MacOS oder Linux
-        os.system('clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
+def download_file(url, directory=None, new_filename="sideloadbypass1"):
+    print("Please wait. Sideload detections are downloading...")
+    if directory is None:
+        directory = os.getcwd()
+
+    directory = os.path.join(directory, "sideloadbypasses")
+    os.makedirs(directory, exist_ok=True)
+    filename = new_filename
+    file_path = os.path.join(directory, filename)
+
+    with requests.get(url, stream=True) as response:
+        response.raise_for_status()
+
+        with open(file_path, "wb") as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
+
+    new_file_path = f"{file_path}.dylib"
+    os.rename(file_path, new_file_path)
+    clear_terminal()
+    print(f"{filename}.dylib downloaded sucessfully and saved in {directory}")
+    return new_file_path
+
         
                                                                                 #unzip iPA
 def unzip_ipa(ipa_path):
@@ -403,7 +424,6 @@ if option == 9:
                 json.dump(list_data, data_file)
 
         elif action.lower() == "2":
-            # Display list of items
             print("List of items:")
             for i, item in enumerate(list_data):
                 print(f"{i}: {item['name']}")
@@ -467,25 +487,30 @@ if option == 7:
             try:
                 with open('sideload_detection_paths.pkl', 'rb') as f:
                     sideload_detection_paths = pickle.load(f)
-
             except FileNotFoundError:
-                sideload_bypass1 = input("Enter the path of 'Sideloadbypass1.dylib'\n")
-                clear_terminal()
-                sideload_bypass2 = input("Enter the path of 'Sideloadbypass2.dylib'\n")
-                clear_terminal()
-                sideloadly_bypass = input("Enter the path of 'SideloadDetection-05/6.dylib'\n")
-                clear_terminal()
+                url1 = "https://hostigram.xyz/?tkn=6ZmHJCsqRid9PWlZaTrOkkPOwR3C6FL3WIKOF43ZFF3So&dl=1"
+                sideload_bypass1 = download_file(url1, new_filename="sideloadbypass1")
+
+                url2 = "https://hostigram.xyz/?tkn=aGNsVGeiNZsbffybvLmYorMMBRH1wFqxvrFvh8tAoDlcB&dl=1"
+                sideload_bypass2 = download_file(url2, new_filename="sideloadbypass2")
+
+                url3 = "https://hostigram.xyz/?tkn=IGoXE9Fyb4VQI63SrK7dACrLQcH9q8tqCEFxiUM1BWrfP&dl=1"
+                sideloadly_bypass = download_file(url3, new_filename="sideloadlybypass")
+
                 sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
                                             'sideload_bypass2': sideload_bypass2,
                                             'sideloadly_bypass': sideloadly_bypass}
                 with open('sideload_detection_paths.pkl', 'wb') as f:
-                    pickle.dump(sideload_detection_paths, f)    
-                    
+                    pickle.dump(sideload_detection_paths, f)
+
+                clear_terminal()
                 print("Permanently saved the paths to the sideload detection bypass .dylibs so you don't have to enter them everytime..")
                 time.sleep(3)
-                sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
-                sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
-                sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
+                clear_terminal()
+
+            sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
+            sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
+            sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
             
             sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
             clear_terminal()
@@ -494,7 +519,7 @@ if option == 7:
             sideload_detection_bypass_ipa_output_name = input("Enter a name for the patched iPA:\n")
             clear_terminal()
         
-            bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n"))
+            bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n[3] Sideloadbypass1 & Sideloadbypass2 & Sideloadly Bypass\n"))
             clear_terminal()
         
             if bypass_selection == 1:
@@ -506,6 +531,13 @@ if option == 7:
             
             elif bypass_selection == 2:
                 azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(azule_cmd, shell=True)
+                clear_terminal()
+                print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
+                
+            elif bypass_selection == 3: 
+                azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2 + " " + sideloadly_bypass
+                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
                 subprocess.run(azule_cmd, shell=True)
                 clear_terminal()
                 print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
@@ -534,7 +566,7 @@ if option == 0:
             downloaded_size += len(data)
             f.write(data)
             progress = downloaded_size / total_size * 100
-            print(f"Download Fortschritt: {progress:.2f}%", end="\r")
+            print(f"Download progres: {progress:.2f}%", end="\r")
 
     if total_size != 0 and downloaded_size != total_size:
         print("failed to download.")
