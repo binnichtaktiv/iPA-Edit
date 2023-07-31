@@ -56,10 +56,21 @@ def unzip_ipa(ipa_path):
         print("The .iPA file could not be found. Try again...")
         exit()
 
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(os.path.dirname(zip_path))
+    ipa_directory = os.path.dirname(zip_path)
+    payload_path = os.path.join(ipa_directory, "Payload")
 
-    payload_path = os.path.join(os.path.dirname(zip_path), "Payload")
+    ipa_temp = None
+    if os.path.exists(payload_path):
+        ipa_temp = os.path.join(ipa_directory, "ipa_temp")
+        os.makedirs(ipa_temp, exist_ok=True)
+        unzip_directory = ipa_temp
+    else:
+        unzip_directory = ipa_directory
+
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(unzip_directory)
+
+    payload_path = os.path.join(unzip_directory, "Payload")
 
     app_folder = None
     for item in os.listdir(payload_path):
@@ -72,8 +83,13 @@ def unzip_ipa(ipa_path):
         exit()
 
     app_path = os.path.join(payload_path, app_folder)
-    return app_path, file_name_no_ipa, zip_path, payload_path
 
+    if ipa_temp:
+        output_ipa = zip_path.replace(".zip", ".ipa")
+        shutil.move(output_ipa, ipa_directory)
+        shutil.rmtree(ipa_temp)
+
+    return app_path, file_name_no_ipa, zip_path, payload_path, ipa_temp
                                                                                 #zip iPA
 
 def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
@@ -119,32 +135,61 @@ print("[11] change .dylib dependency")
 option = int(input("Choose an option: \n"))
 clear_terminal() 
  
-if option == 1: 
-    
+if option == 0:
+    url = input("enter a direct download URL: ")
+    clear_terminal()
+    filename = input("enter a name for the downloaded file:")
+    clear_terminal()
+
+    response = requests.get(url, stream=True)
+    total_size = int(response.headers.get("content-length", 0))
+    block_size = 1024
+    downloaded_size = 0
+
+    with open(filename, "wb") as f:
+        for data in response.iter_content(block_size):
+            downloaded_size += len(data)
+            f.write(data)
+            progress = downloaded_size / total_size * 100
+            print(f"Download progress: {progress:.2f}%", end="\r")
+
+    if total_size != 0 and downloaded_size != total_size:
+        print("failed to download.")
+    else:
+        print(f"{filename} was downloaded successfully.")
+
+if option == 1:
+
     ipa_path = input("Please enter the path to the IPA file:\n ")
     clear_terminal()
-    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
- 
-    info_plist_path = os.path.join(app_path, "Info.plist") 
-    with open(info_plist_path, 'rb') as fp: 
-            pl = plistlib.load(fp) 
- 
-    old_bundle_id = pl['CFBundleIdentifier'] 
-    print("Current Bundle-ID: ", old_bundle_id) 
- 
-    new_bundle_id = input("\nPlease enter your new Bundle-ID: \n") 
+    app_path, file_name_no_ipa, zip_path, payload_path, ipa_temp = unzip_ipa(ipa_path)
+
+    info_plist_path = os.path.join(app_path, "Info.plist")
+    with open(info_plist_path, 'rb') as fp:
+        pl = plistlib.load(fp)
+
+    old_bundle_id = pl['CFBundleIdentifier']
+    print("Current Bundle-ID: ", old_bundle_id)
+
+    new_bundle_id = input("\nPlease enter your new Bundle-ID: \n")
     clear_terminal()
     pl['CFBundleIdentifier'] = new_bundle_id
     print("Patching.... Pls wait")
- 
-    with open(info_plist_path, 'wb') as fp: 
-         plistlib.dump(pl, fp) 
-    
+
+    with open(info_plist_path, 'wb') as fp:
+        plistlib.dump(pl, fp)
+
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
-    print("The Bundle ID was changed successfully.")
 
-    #shutil.rmtree()
+    ipa_directory = os.path.dirname(zip_path)
+
+    if ipa_temp:
+        output_ipa = zip_path.replace(".zip", ".ipa")
+        final_output_ipa = os.path.join(ipa_directory, os.path.basename(ipa_path))
+        shutil.move(output_ipa, final_output_ipa)
+        shutil.rmtree(ipa_temp)
+    print("The Bundle ID was changed successfully.")
  
 if option == 2: 
     
@@ -195,6 +240,72 @@ if option == 3:
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
 
     print("The App Version was changed successfully.")
+    
+    
+if option == 4:
+    ipa_path = input("Please enter the path to the IPA file:\n ")
+    clear_terminal()
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
+    
+    info_plist_path = os.path.join(app_path, "Info.plist") 
+    with open(info_plist_path, 'rb') as fp: 
+            pl = plistlib.load(fp) 
+ 
+    old_display_name = pl['CFBundleDisplayName'] 
+    print("Current App-Name: ", old_display_name) 
+ 
+    new_display_name = input("\nPlease enter your new App-Name: \n")
+    clear_terminal() 
+    pl['CFBundleDisplayName'] = new_display_name 
+ 
+    with open(info_plist_path, 'wb') as fp: 
+         plistlib.dump(pl, fp)
+ 
+    with open(info_plist_path, 'wb') as fp: 
+         plistlib.dump(pl, fp) 
+         
+    directory = app_path  
+    for filename in os.listdir(directory): 
+        if filename.startswith("AppIcon") and filename.endswith(".png"): 
+            file_path = os.path.join(directory, filename) 
+            try: 
+                os.remove(file_path)
+                clear_terminal()
+                print(f"\nIcon '{filename}' deleted successfully.") 
+                clear_terminal()
+            except Exception as e: 
+                print(f"\nError deleting file '{filename}': {e}") 
+                 
+    icon_path = input("Enter the path to the .png you want to use as App-Icon:\n")
+    clear_terminal()
+    print("Patching.... Pls wait") 
+     
+    with open(icon_path, 'rb') as fp:
+        png_content = fp.read()
+
+    for size in [(20, 20), (29, 29), (40, 40)]:
+        filename = f"AppIcon{size[0]}x{size[1]}.png"
+        target_path = os.path.join(app_path, filename)
+        with open(target_path, 'wb') as fp:
+            fp.write(png_content)
+
+    plist_path = os.path.join(app_path, "Info.plist")
+    
+    with open(plist_path, 'rb') as fp:
+        plist = plistlib.load(fp)
+
+    for key in list(plist.keys()):
+        if 'Icon' in key:
+            del plist[key]
+            
+    plist['CFBundleIconFiles'] = ['AppIcon20x20', 'AppIcon29x29', 'AppIcon40x40']
+
+    with open(plist_path, 'wb') as fp:
+        plistlib.dump(plist, fp)
+        
+    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
+    clear_terminal()
+    print("The App Icon was changed successfully.")
     
 if option == 5:
     
@@ -285,6 +396,77 @@ if option == 6:
             print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
     except FileNotFoundError:
         print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+        
+if option == 7:
+    program = "azule"
+    try:
+        result = subprocess.run([program, "-h"], capture_output=True, text=True)
+        if result.returncode == 0:
+            try:
+                with open('sideload_detection_paths.pkl', 'rb') as f:
+                    sideload_detection_paths = pickle.load(f)
+            except FileNotFoundError:
+                url1 = "https://hostigram.xyz/?tkn=6ZmHJCsqRid9PWlZaTrOkkPOwR3C6FL3WIKOF43ZFF3So&dl=1"
+                sideload_bypass1 = download_file(url1, new_filename="sideloadbypass1")
+
+                url2 = "https://hostigram.xyz/?tkn=aGNsVGeiNZsbffybvLmYorMMBRH1wFqxvrFvh8tAoDlcB&dl=1"
+                sideload_bypass2 = download_file(url2, new_filename="sideloadbypass2")
+
+                url3 = "https://hostigram.xyz/?tkn=IGoXE9Fyb4VQI63SrK7dACrLQcH9q8tqCEFxiUM1BWrfP&dl=1"
+                sideloadly_bypass = download_file(url3, new_filename="sideloadlybypass")
+
+                sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
+                                            'sideload_bypass2': sideload_bypass2,
+                                            'sideloadly_bypass': sideloadly_bypass}
+                with open('sideload_detection_paths.pkl', 'wb') as f:
+                    pickle.dump(sideload_detection_paths, f)
+
+                clear_terminal()
+                print("Permanently saved the paths to the sideload detection bypass .dylibs so you don't have to enter them everytime..")
+                time.sleep(3)
+                clear_terminal()
+
+            sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
+            sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
+            sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
+            
+            sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
+            clear_terminal()
+            sideload_detection_bypass_ipa_output = input("Enter an output path:\n")
+            clear_terminal()
+            sideload_detection_bypass_ipa_output_name = input("Enter a name for the patched iPA:\n")
+            clear_terminal()
+        
+            bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n[3] Sideloadbypass1 & Sideloadbypass2 & Sideloadly Bypass\n"))
+            clear_terminal()
+        
+            if bypass_selection == 1:
+                azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
+                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(azule_cmd, shell=True)
+                clear_terminal()
+                print("Modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
+            
+            elif bypass_selection == 2:
+                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(azule_cmd, shell=True)
+                clear_terminal()
+                print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
+                
+            elif bypass_selection == 3: 
+                azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2 + " " + sideloadly_bypass
+                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(azule_cmd, shell=True)
+                clear_terminal()
+                print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
+            
+            else:
+                print("Not a valid option... Try again")
+                exit()
+        else:
+            print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+    except FileNotFoundError:
+        print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
     
 if option == 8:
     program = "azule"
@@ -324,71 +506,6 @@ if option == 8:
     except FileNotFoundError:
         print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
         
-if option == 4:
-    ipa_path = input("Please enter the path to the IPA file:\n ")
-    clear_terminal()
-    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
-    
-    info_plist_path = os.path.join(app_path, "Info.plist") 
-    with open(info_plist_path, 'rb') as fp: 
-            pl = plistlib.load(fp) 
- 
-    old_display_name = pl['CFBundleDisplayName'] 
-    print("Current App-Name: ", old_display_name) 
- 
-    new_display_name = input("\nPlease enter your new App-Name: \n")
-    clear_terminal() 
-    pl['CFBundleDisplayName'] = new_display_name 
- 
-    with open(info_plist_path, 'wb') as fp: 
-         plistlib.dump(pl, fp)
- 
-    with open(info_plist_path, 'wb') as fp: 
-         plistlib.dump(pl, fp) 
-         
-    directory = app_path  
-    for filename in os.listdir(directory): 
-        if filename.startswith("AppIcon") and filename.endswith(".png"): 
-            file_path = os.path.join(directory, filename) 
-            try: 
-                os.remove(file_path)
-                clear_terminal()
-                print(f"\nIcon '{filename}' deleted successfully.") 
-                clear_terminal()
-            except Exception as e: 
-                print(f"\nError deleting file '{filename}': {e}") 
-                 
-    icon_path = input("Enter the path to the .png you want to use as App-Icon:\n")
-    clear_terminal()
-    print("Patching.... Pls wait") 
-     
-    with open(icon_path, 'rb') as fp:
-        png_content = fp.read()
-
-    for size in [(20, 20), (29, 29), (40, 40)]:
-        filename = f"AppIcon{size[0]}x{size[1]}.png"
-        target_path = os.path.join(app_path, filename)
-        with open(target_path, 'wb') as fp:
-            fp.write(png_content)
-
-    plist_path = os.path.join(app_path, "Info.plist")
-    
-    with open(plist_path, 'rb') as fp:
-        plist = plistlib.load(fp)
-
-    for key in list(plist.keys()):
-        if 'Icon' in key:
-            del plist[key]
-            
-    plist['CFBundleIconFiles'] = ['AppIcon20x20', 'AppIcon29x29', 'AppIcon40x40']
-
-    with open(plist_path, 'wb') as fp:
-        plistlib.dump(plist, fp)
-        
-    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
-    clear_terminal()
-    print("The App Icon was changed successfully.")
-    
 
 if option == 9:
     data_file_path = "azulelist_data.json"
@@ -478,101 +595,41 @@ if option == 9:
     os.system(command)
     print("App was patched successfully.")
     
-    
-if option == 7:
-    program = "azule"
-    try:
-        result = subprocess.run([program, "-h"], capture_output=True, text=True)
-        if result.returncode == 0:
-            try:
-                with open('sideload_detection_paths.pkl', 'rb') as f:
-                    sideload_detection_paths = pickle.load(f)
-            except FileNotFoundError:
-                url1 = "https://hostigram.xyz/?tkn=6ZmHJCsqRid9PWlZaTrOkkPOwR3C6FL3WIKOF43ZFF3So&dl=1"
-                sideload_bypass1 = download_file(url1, new_filename="sideloadbypass1")
+if option == 10:
 
-                url2 = "https://hostigram.xyz/?tkn=aGNsVGeiNZsbffybvLmYorMMBRH1wFqxvrFvh8tAoDlcB&dl=1"
-                sideload_bypass2 = download_file(url2, new_filename="sideloadbypass2")
-
-                url3 = "https://hostigram.xyz/?tkn=IGoXE9Fyb4VQI63SrK7dACrLQcH9q8tqCEFxiUM1BWrfP&dl=1"
-                sideloadly_bypass = download_file(url3, new_filename="sideloadlybypass")
-
-                sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
-                                            'sideload_bypass2': sideload_bypass2,
-                                            'sideloadly_bypass': sideloadly_bypass}
-                with open('sideload_detection_paths.pkl', 'wb') as f:
-                    pickle.dump(sideload_detection_paths, f)
-
-                clear_terminal()
-                print("Permanently saved the paths to the sideload detection bypass .dylibs so you don't have to enter them everytime..")
-                time.sleep(3)
-                clear_terminal()
-
-            sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
-            sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
-            sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
-            
-            sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
-            clear_terminal()
-            sideload_detection_bypass_ipa_output = input("Enter an output path:\n")
-            clear_terminal()
-            sideload_detection_bypass_ipa_output_name = input("Enter a name for the patched iPA:\n")
-            clear_terminal()
-        
-            bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n[3] Sideloadbypass1 & Sideloadbypass2 & Sideloadly Bypass\n"))
-            clear_terminal()
-        
-            if bypass_selection == 1:
-                azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
-                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True)
-                clear_terminal()
-                print("Modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
-            
-            elif bypass_selection == 2:
-                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True)
-                clear_terminal()
-                print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
-                
-            elif bypass_selection == 3: 
-                azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2 + " " + sideloadly_bypass
-                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True)
-                clear_terminal()
-                print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
-            
-            else:
-                print("Not a valid option... Try again")
-                exit()
-        else:
-            print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
-    except FileNotFoundError:
-        print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
-        
-if option == 0:
-    url = input("enter a direct download URL: ")
+    ipa_path = input("Please enter the path to the IPA file:\n ")
     clear_terminal()
-    filename = input("enter a name for the downloaded file:")
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
+
+    dylib_files = []
+    for root, _, files in os.walk(ipa_path):
+        for file in files:
+            if file.endswith('.dylib'):
+                dylib_files.append(os.path.join(root, file))
+
+    if not dylib_files:
+        print("Error: No .dylib files found in the IPA file.")
+        exit()
+
+    print('found .dylibs:')
+    for index, file in enumerate(dylib_files, start=1):
+        print(f'{index}: {os.path.basename(file)}')
+
     clear_terminal()
+    selected_files = input('Enter the numbers of the files to be exported separated by commas: ')
+    clear_terminal()
+    selected_indices = [int(num.strip()) - 1 for num in selected_files.split(',')]
+    selected_dylib_files = [dylib_files[index] for index in selected_indices]
 
-    response = requests.get(url, stream=True)
-    total_size = int(response.headers.get("content-length", 0))
-    block_size = 1024
-    downloaded_size = 0
+    export_path = input('Enter a output path\n: ')
+    clear_terminal()
+    if not os.path.exists(export_path):
+        os.makedirs(export_path)
 
-    with open(filename, "wb") as f:
-        for data in response.iter_content(block_size):
-            downloaded_size += len(data)
-            f.write(data)
-            progress = downloaded_size / total_size * 100
-            print(f"Download progres: {progress:.2f}%", end="\r")
+    for file in selected_dylib_files:
+        shutil.copy(file, export_path)
 
-    if total_size != 0 and downloaded_size != total_size:
-        print("failed to download.")
-    else:
-        print(f"{filename} was downloaded successfully.")
-
+    print('Exported .dylibs successfully')
     
 if option == 11:
 
@@ -627,46 +684,7 @@ if option == 11:
     else:
         print("This is not a .dylib file! Try again")
         exit()
-        
-        
 
-if option == 10:
-
-
-    ipa_path = input("Please enter the path to the IPA file:\n ")
-    clear_terminal()
-    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
-
-    dylib_files = []
-    for root, _, files in os.walk(ipa_path):
-        for file in files:
-            if file.endswith('.dylib'):
-                dylib_files.append(os.path.join(root, file))
-
-    if not dylib_files:
-        print("Error: No .dylib files found in the IPA file.")
-        exit()
-
-    print('found .dylibs:')
-    for index, file in enumerate(dylib_files, start=1):
-        print(f'{index}: {os.path.basename(file)}')
-
-    clear_terminal()
-    selected_files = input('Enter the numbers of the files to be exported separated by commas: ')
-    clear_terminal()
-    selected_indices = [int(num.strip()) - 1 for num in selected_files.split(',')]
-    selected_dylib_files = [dylib_files[index] for index in selected_indices]
-
-    export_path = input('Enter a output path\n: ')
-    clear_terminal()
-    if not os.path.exists(export_path):
-        os.makedirs(export_path)
-
-    for file in selected_dylib_files:
-        shutil.copy(file, export_path)
-
-    print('Exported .dylibs successfully')
-    
 if option > 11:
     print("Not a valid option. Try again.")
     exit()
