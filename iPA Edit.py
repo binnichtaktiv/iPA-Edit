@@ -341,7 +341,7 @@ if option == 5:
 if option == 6:
     program = "azule"
     try:
-        result = subprocess.run([program, "-h"], capture_output=True, text=True)
+        result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
         if result.returncode == 0:
             try:
                 with open(filename, 'rb') as f:
@@ -381,7 +381,7 @@ if option == 6:
 if option == 7:
     program = "azule"
     try:
-        result = subprocess.run([program, "-h"], capture_output=True, text=True)
+        result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
         if result.returncode == 0:
             try:
                 with open('sideload_detection_paths.pkl', 'rb') as f:
@@ -424,20 +424,20 @@ if option == 7:
             if bypass_selection == 1:
                 azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
                 azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True)
+                subprocess.run(azule_cmd, shell=True, check=True)
                 clear_terminal()
                 print("Modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
 
             elif bypass_selection == 2:
                 azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True)
+                subprocess.run(azule_cmd, shell=True, check=True)
                 clear_terminal()
                 print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
 
             elif bypass_selection == 3: 
                 azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2 + " " + sideloadly_bypass
                 azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True)
+                subprocess.run(azule_cmd, shell=True, check=True)
                 clear_terminal()
                 print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
 
@@ -452,7 +452,7 @@ if option == 7:
 if option == 8:
     program = "azule"
     try:
-        result = subprocess.run([program, "-h"], capture_output=True, text=True)
+        result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
         if result.returncode == 0:
             azule_ipa_input = input("Enter the path to the iPA you want to inject debs into: \n")
             clear_terminal()
@@ -479,7 +479,7 @@ if option == 8:
             deb_paths = " ".join(file_paths)
             terminal_command = f"azule -o '{azule_ipa_output}' -i '{azule_ipa_input}' -f '{deb_paths}' -z -n '{azule_ipa_output_name}'"
 
-            subprocess.run(terminal_command, shell=True)
+            subprocess.run(terminal_command, shell=True, check=True)
             clear_terminal()
             print("Modified .iPA should be here:" + azule_ipa_output)
         else:
