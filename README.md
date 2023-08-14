@@ -1,5 +1,5 @@
 # iPA-Edit
-can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sideload Detection Bypass,  inject .debs/.dylibs,  update modded apps,  export .dylib(s) of an iPA, change .dylib dependency - i will keep adding more
+can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sideload Detection Bypass,  inject .debs/.dylibs,  update modded apps,  export .dylib(s) of an iPA, change .dylib dependency, add a cracker name (hidden) - i will keep adding more
 
 [1] change Bundle-ID
 
@@ -22,6 +22,8 @@ can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sidel
 [10] export .dylib(s) of an iPA
 
 [11] change .dylib dependency
+
+[12] add your cracker name to a iPA (hidden)
 
 
 run `pip(3) install requests` first
