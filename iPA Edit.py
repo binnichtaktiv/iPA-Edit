@@ -8,7 +8,7 @@ import subprocess
 import time
 import json
 import requests
- 
+
 payload_name = "Payload.zip" 
 filename = 'variable.pkl'
 data_file_path = "list_data.json"
@@ -17,7 +17,7 @@ sideload_detection_paths = 'sideload_detection_paths.pkl'
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
-    
+
 def download_file(url, directory=None, new_filename="sideloadbypass1"):
     print("Please wait. Sideload detections are downloading...")
     if directory is None:
@@ -41,7 +41,7 @@ def download_file(url, directory=None, new_filename="sideloadbypass1"):
     print(f"{filename}.dylib downloaded sucessfully and saved in {directory}")
     return new_file_path
 
-        
+
                                                                                 #unzip iPA
 def unzip_ipa(ipa_path):
     clear_terminal()
@@ -80,19 +80,19 @@ def unzip_ipa(ipa_path):
 
 def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
     payload_path2 = payload_path
-    
+
     if os.path.basename(payload_path2) == "Payload":
         output_path = payload_path2[:len(payload_path2)-len("/Payload")]
     else:
         output_path = os.path.dirname(payload_path2)
- 
+
     output_path = os.path.join(output_path) 
     with zipfile.ZipFile(os.path.join(output_path, "Payload.zip"), 'w', zipfile.ZIP_DEFLATED) as zip_file:  
        for root, dirs, files in os.walk(payload_path): 
            for file in files: 
                file_path = os.path.join(root, file) 
                zip_file.write(file_path, file_path.replace(payload_path, "Payload")) 
-                
+
     clear_terminal()           
     user_new_ipa_name = input(f"enter a new name for your edited .ipa (without the .ipa at the end) \noriginal .ipa name: {file_name_no_ipa}'\n") 
     clear_terminal()
@@ -104,7 +104,7 @@ def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
     os.remove(zip_path)
 
                                                                                 #start
-                                                                                            
+
 print("\n[0] download iPAs via direct URL")
 print("[1] change Bundle-ID") 
 print("[2] change App-Name") 
@@ -118,7 +118,7 @@ print("[9] update modded apps")
 print("[10] export .dylib(s) of an iPA")
 print("[11] change .dylib dependency")
 print("[12] add your cracker name to a iPA (hidden)")
- 
+
 option = int(input("Choose an option: \n"))
 clear_terminal() 
 
@@ -144,61 +144,36 @@ if option == 0:
         print("failed to download.")
     else:
         print(f"{filename} was downloaded successfully.")
- 
+
 if option == 1: 
-    
+
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
- 
+
     info_plist_path = os.path.join(app_path, "Info.plist") 
     with open(info_plist_path, 'rb') as fp: 
             pl = plistlib.load(fp) 
- 
+
     old_bundle_id = pl['CFBundleIdentifier'] 
     print("Current Bundle-ID: ", old_bundle_id) 
- 
+
     new_bundle_id = input("\nPlease enter your new Bundle-ID: \n") 
     clear_terminal()
     pl['CFBundleIdentifier'] = new_bundle_id
     print("Patching.... Pls wait")
- 
+
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
-    
+
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
     print("The Bundle ID was changed successfully.")
 
     #shutil.rmtree()
- 
+
 if option == 2: 
-    
-    ipa_path = input("Please enter the path to the IPA file:\n")
-    clear_terminal()
-    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
-    
-    info_plist_path = os.path.join(app_path, "Info.plist") 
-    with open(info_plist_path, 'rb') as fp: 
-            pl = plistlib.load(fp) 
- 
-    old_display_name = pl['CFBundleDisplayName'] 
-    print("Current App-Name: ", old_display_name) 
- 
-    new_display_name = input("Please enter your new App-Name: \n")
-    clear_terminal() 
-    pl['CFBundleDisplayName'] = new_display_name 
-    print("Patching.... Pls wait")
- 
-    with open(info_plist_path, 'wb') as fp: 
-         plistlib.dump(pl, fp) 
-         
-    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
-    clear_terminal()
-    print("The App Name was changed successfully.")
-    
-if option == 3:
-    
+
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
@@ -206,18 +181,43 @@ if option == 3:
     info_plist_path = os.path.join(app_path, "Info.plist") 
     with open(info_plist_path, 'rb') as fp: 
             pl = plistlib.load(fp) 
- 
+
+    old_display_name = pl['CFBundleDisplayName'] 
+    print("Current App-Name: ", old_display_name) 
+
+    new_display_name = input("Please enter your new App-Name: \n")
+    clear_terminal() 
+    pl['CFBundleDisplayName'] = new_display_name 
+    print("Patching.... Pls wait")
+
+    with open(info_plist_path, 'wb') as fp: 
+         plistlib.dump(pl, fp) 
+
+    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
+    clear_terminal()
+    print("The App Name was changed successfully.")
+
+if option == 3:
+
+    ipa_path = input("Please enter the path to the IPA file:\n")
+    clear_terminal()
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
+
+    info_plist_path = os.path.join(app_path, "Info.plist") 
+    with open(info_plist_path, 'rb') as fp: 
+            pl = plistlib.load(fp) 
+
     old_version = pl['CFBundleShortVersionString'] 
     print("\nCurrent App-Version: ", old_version) 
- 
+
     new_version = input("\nPlease enter your new App-Version: \n")
     clear_terminal()
     pl['CFBundleShortVersionString'] = new_version
     print("Patching.... Pls wait") 
- 
+
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
-         
+
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
 
     print("The App Version was changed successfully.")
@@ -226,24 +226,24 @@ if option == 4:
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
-    
+
     info_plist_path = os.path.join(app_path, "Info.plist") 
     with open(info_plist_path, 'rb') as fp: 
             pl = plistlib.load(fp) 
- 
+
     old_display_name = pl['CFBundleDisplayName'] 
     print("Current App-Name: ", old_display_name) 
- 
+
     new_display_name = input("\nPlease enter your new App-Name: \n")
     clear_terminal() 
     pl['CFBundleDisplayName'] = new_display_name 
- 
+
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp)
- 
+
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
-         
+
     directory = app_path  
     for filename in os.listdir(directory): 
         if filename.startswith("AppIcon") and filename.endswith(".png"): 
@@ -255,11 +255,11 @@ if option == 4:
                 clear_terminal()
             except Exception as e: 
                 print(f"\nError deleting file '{filename}': {e}") 
-                 
+
     icon_path = input("Enter the path to the .png you want to use as App-Icon:\n")
     clear_terminal()
     print("Patching.... Pls wait") 
-     
+
     with open(icon_path, 'rb') as fp:
         png_content = fp.read()
 
@@ -270,29 +270,29 @@ if option == 4:
             fp.write(png_content)
 
     plist_path = os.path.join(app_path, "Info.plist")
-    
+
     with open(plist_path, 'rb') as fp:
         plist = plistlib.load(fp)
 
     for key in list(plist.keys()):
         if 'Icon' in key:
             del plist[key]
-            
+
     plist['CFBundleIconFiles'] = ['AppIcon20x20', 'AppIcon29x29', 'AppIcon40x40']
 
     with open(plist_path, 'wb') as fp:
         plistlib.dump(plist, fp)
-        
+
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
     print("The App Icon was changed successfully.")
 
 if option == 5:
-    
+
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
-    
+
     directory = app_path # aktuellen ordner 
     for filename in os.listdir(directory): 
         if filename.startswith("AppIcon") and filename.endswith(".png"): 
@@ -304,11 +304,11 @@ if option == 5:
                 clear_terminal()
             except Exception as e: 
                 print(f"\nError deleting file '{filename}': {e}") 
-                 
+
     icon_path = input("Enter the path to the .png you want to use as App-Icon:\n")
     clear_terminal()
     print("Patching.... Pls wait") 
-     
+
     with open(icon_path, 'rb') as fp:
         png_content = fp.read()
 
@@ -319,25 +319,25 @@ if option == 5:
             fp.write(png_content)
 
     plist_path = os.path.join(app_path, "Info.plist")
-    
+
     #edit plist
-    
+
     with open(plist_path, 'rb') as fp:
         plist = plistlib.load(fp)
 
     for key in list(plist.keys()):
         if 'Icon' in key:
             del plist[key]
-            
+
     plist['CFBundleIconFiles'] = ['AppIcon20x20', 'AppIcon29x29', 'AppIcon40x40']
 
     with open(plist_path, 'wb') as fp:
         plistlib.dump(plist, fp)
-        
+
     zip_ipa(ipa_path, app_path, file_name_no_ipa)
     clear_terminal()
     print("App Icon was changed successfully.")
-    
+
 if option == 6:
     program = "azule"
     try:
@@ -410,37 +410,37 @@ if option == 7:
             sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
             sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
             sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
-            
+
             sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
             clear_terminal()
             sideload_detection_bypass_ipa_output = input("Enter an output path:\n")
             clear_terminal()
             sideload_detection_bypass_ipa_output_name = input("Enter a name for the patched iPA:\n")
             clear_terminal()
-        
+
             bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n[3] Sideloadbypass1 & Sideloadbypass2 & Sideloadly Bypass\n"))
             clear_terminal()
-        
+
             if bypass_selection == 1:
                 azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
                 azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
                 subprocess.run(azule_cmd, shell=True)
                 clear_terminal()
                 print("Modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
-            
+
             elif bypass_selection == 2:
                 azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
                 subprocess.run(azule_cmd, shell=True)
                 clear_terminal()
                 print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
-                
+
             elif bypass_selection == 3: 
                 azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2 + " " + sideloadly_bypass
                 azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
                 subprocess.run(azule_cmd, shell=True)
                 clear_terminal()
                 print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
-            
+
             else:
                 print("Not a valid option... Try again")
                 sys.exit()
@@ -448,7 +448,7 @@ if option == 7:
             print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
     except FileNotFoundError:
         print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
-    
+
 if option == 8:
     program = "azule"
     try:
@@ -486,7 +486,7 @@ if option == 8:
             print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
     except FileNotFoundError:
         print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
-            
+
 
 if option == 9:
     data_file_path = "azulelist_data.json"
@@ -537,11 +537,11 @@ if option == 9:
             except:
                 clear_terminal()
                 print("Invalid input, please try again.")
-                
+
 
             with open(data_file_path, "w") as data_file:
                 json.dump(list_data, data_file)
-                
+
         elif action.lower() == "4":
             sys.exit()
 
@@ -575,7 +575,7 @@ if option == 9:
     command = f"azule -o '{output_path_azulelist}' -i '{ipa_path_for_azulelist}' -f {debs_paths_str} -z -n {new_ipa_name}"
     os.system(command)
     print("App was patched successfully.")
-    
+
 if option == 10:
 
 
@@ -612,15 +612,15 @@ if option == 10:
         shutil.copy(file, export_path)
 
     print('Exported .dylibs successfully')        
-    
+
 if option == 11:
 
     file_path = input("Enter path to .dylib: ")
-    
+
     if file_path.endswith(".deb"):
         print("You have to extract the .deb! Extract it and try with the .dylib again")
         sys.exit()
-        
+
     if file_path.endswith(".dylib"):
         clear_terminal()
         dep_option = int(input("What do you want to change? \n [1] @rpath/CydiaSubstrate.framework/CydiaSubstrate \n [2] other dependency \n"))
@@ -662,7 +662,7 @@ if option == 11:
                     file.write(content)
             clear_terminal()
             print("Changed dependency successfully.")
-            
+
     else:
         print("This is not a .dylib file! Try again")
         sys.exit()
