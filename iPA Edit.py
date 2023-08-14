@@ -1,4 +1,5 @@
 import os 
+import sys
 import zipfile 
 import plistlib 
 import shutil
@@ -54,7 +55,7 @@ def unzip_ipa(ipa_path):
         clear_terminal()
     else:
         print("The .iPA file could not be found. Try again...")
-        exit()
+        sys.exit()
 
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(os.path.dirname(zip_path))
@@ -69,7 +70,7 @@ def unzip_ipa(ipa_path):
 
     if app_folder is None:
         print("App folder not found. Try it again...")
-        exit()
+        sys.exit()
 
     app_path = os.path.join(payload_path, app_folder)
     return app_path, file_name_no_ipa, zip_path, payload_path
@@ -442,7 +443,7 @@ if option == 7:
             
             else:
                 print("Not a valid option... Try again")
-                exit()
+                sys.exit()
         else:
             print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
     except FileNotFoundError:
@@ -461,7 +462,7 @@ if option == 8:
                 clear_terminal()
             else:
                 print("Couldnt find .iPA file. Try again.")
-                exit()
+                sys.exit()
 
             azule_ipa_output = input("Enter the output path for your modified .iPA: \n")
             clear_terminal()
@@ -542,7 +543,7 @@ if option == 9:
                 json.dump(list_data, data_file)
                 
         elif action.lower() == "4":
-            exit()
+            sys.exit()
 
         elif action.lower() == "3":
             print("List of items:")
@@ -590,7 +591,7 @@ if option == 10:
 
     if not dylib_files:
         print("Error: No .dylib files found in the IPA file.")
-        exit()
+        sys.exit()
 
     print('found .dylibs:')
     for index, file in enumerate(dylib_files, start=1):
@@ -618,7 +619,7 @@ if option == 11:
     
     if file_path.endswith(".deb"):
         print("You have to extract the .deb! Extract it and try with the .dylib again")
-        exit()
+        sys.exit()
         
     if file_path.endswith(".dylib"):
         clear_terminal()
@@ -664,7 +665,7 @@ if option == 11:
             
     else:
         print("This is not a .dylib file! Try again")
-        exit()
+        sys.exit()
 
 if option == 12:
     ipa_path = input("Please enter the path to the IPA file:\n")
@@ -692,4 +693,4 @@ if option == 12:
 
 if option >= 13:
     print("Not a valid option. Try again.")
-    exit()
+    sys.exit()
