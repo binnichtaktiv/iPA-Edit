@@ -116,6 +116,7 @@ print("[8] inject .debs/.dylibs")
 print("[9] update modded apps")
 print("[10] export .dylib(s) of an iPA")
 print("[11] change .dylib dependency")
+print("[12] add your cracker name to a iPA (hidden)")
  
 option = int(input("Choose an option: \n"))
 clear_terminal() 
@@ -145,7 +146,7 @@ if option == 0:
  
 if option == 1: 
     
-    ipa_path = input("Please enter the path to the IPA file:\n ")
+    ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
  
@@ -172,7 +173,7 @@ if option == 1:
  
 if option == 2: 
     
-    ipa_path = input("Please enter the path to the IPA file:\n ")
+    ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
     
@@ -197,7 +198,7 @@ if option == 2:
     
 if option == 3:
     
-    ipa_path = input("Please enter the path to the IPA file:\n ")
+    ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
 
@@ -221,7 +222,7 @@ if option == 3:
     print("The App Version was changed successfully.")
 
 if option == 4:
-    ipa_path = input("Please enter the path to the IPA file:\n ")
+    ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
     
@@ -287,7 +288,7 @@ if option == 4:
 
 if option == 5:
     
-    ipa_path = input("Please enter the path to the IPA file:\n ")
+    ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
     
@@ -349,7 +350,7 @@ if option == 6:
                 clear_terminal()
                 with open(filename, 'wb') as f:
                     pickle.dump(satella_jailed_folder, f)
-                print('Created permanent variable for your Satella path.\n')
+                print("Created permanent variable for your Satella path.\n")
                 time.sleep(4)
                 clear_terminal()
 
@@ -385,13 +386,13 @@ if option == 7:
                 with open('sideload_detection_paths.pkl', 'rb') as f:
                     sideload_detection_paths = pickle.load(f)
             except FileNotFoundError:
-                url1 = "https://hostigram.xyz/?tkn=6ZmHJCsqRid9PWlZaTrOkkPOwR3C6FL3WIKOF43ZFF3So&dl=1"
+                url1 = "https://github.com/binnichtaktiv/iPA-Edit/raw/main/bypasses/Sideloadbypass1.dylib"
                 sideload_bypass1 = download_file(url1, new_filename="sideloadbypass1")
 
-                url2 = "https://hostigram.xyz/?tkn=aGNsVGeiNZsbffybvLmYorMMBRH1wFqxvrFvh8tAoDlcB&dl=1"
+                url2 = "https://github.com/binnichtaktiv/iPA-Edit/raw/main/bypasses/Sideloadbypass2.dylib"
                 sideload_bypass2 = download_file(url2, new_filename="sideloadbypass2")
 
-                url3 = "https://hostigram.xyz/?tkn=IGoXE9Fyb4VQI63SrK7dACrLQcH9q8tqCEFxiUM1BWrfP&dl=1"
+                url3 = "https://github.com/binnichtaktiv/iPA-Edit/raw/main/bypasses/SideloadSpoofer-08.dylib"
                 sideloadly_bypass = download_file(url3, new_filename="sideloadlybypass")
 
                 sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
@@ -566,7 +567,7 @@ if option == 9:
     clear_terminal()
     new_ipa_name = input("Enter a name for the patched iPA: \n")
     clear_terminal()
-    output_path_azulelist = input("Enter a output path: \n ")
+    output_path_azulelist = input("Enter a output path: \n")
     clear_terminal()
 
     debs_paths_str = ' '.join(item['debs_path'])
@@ -577,7 +578,7 @@ if option == 9:
 if option == 10:
 
 
-    ipa_path = input("Please enter the path to the IPA file:\n ")
+    ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
 
@@ -596,7 +597,7 @@ if option == 10:
         print(f'{index}: {os.path.basename(file)}')
 
     #clear_terminal()
-    selected_files = input('Enter the numbers of the files to be exported separated by commas: ')
+    selected_files = input('Enter the numbers of the files to be exported separated by commas:')
     clear_terminal()
     selected_indices = [int(num.strip()) - 1 for num in selected_files.split(',')]
     selected_dylib_files = [dylib_files[index] for index in selected_indices]
@@ -643,7 +644,7 @@ if option == 11:
             print("Changed dependency successfully.")
         else:
             clear_terminal()
-            old_word = input("Enter the path of the dependency you want to change\n Example: '@executable_path/tweak.dylib' \n ")
+            old_word = input("Enter the path of the dependency you want to change\n Example: '@executable_path/tweak.dylib' \n")
             with open(file_path, 'rb') as file:
                 content = file.read()
 
@@ -664,8 +665,31 @@ if option == 11:
     else:
         print("This is not a .dylib file! Try again")
         exit()
-        
-    
-if option > 11:
+
+if option == 12:
+    ipa_path = input("Please enter the path to the IPA file:\n")
+    clear_terminal()
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
+
+    info_plist_path = os.path.join(app_path, "Info.plist") 
+    with open(info_plist_path, 'rb') as fp: 
+            pl = plistlib.load(fp) 
+
+    cracked_by = input("Please enter your cracker name: \n")
+    clear_terminal()
+    pl['cracked_by'] = cracked_by
+
+    print("Patching.... Pls wait")
+    clear_terminal()
+
+    with open(info_plist_path, 'wb') as fp: 
+        plistlib.dump(pl, fp) 
+
+    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
+    clear_terminal()
+    print("Cracker name entry added")
+
+
+if option >= 13:
     print("Not a valid option. Try again.")
     exit()
