@@ -120,6 +120,7 @@ print("[9] update modded apps")
 print("[10] export .dylib(s) of an iPA")
 print("[11] change .dylib dependency")
 print("[12] add your cracker name to a iPA (hidden)")
+print("[13] sign and upload every iPA in a folder (paid/free certificate)")
 
 option = int(input("Choose an option: \n"))
 clear_terminal() 
@@ -163,7 +164,7 @@ if option == 1:
     new_bundle_id = input("\nPlease enter your new Bundle-ID: \n") 
     clear_terminal()
     pl['CFBundleIdentifier'] = new_bundle_id
-    print("Patching.... Pls wait")
+    print("Patching.... Please wait. It may take a while depending on the file size")
 
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
@@ -190,7 +191,7 @@ if option == 2:
     new_display_name = input("Please enter your new App-Name: \n")
     clear_terminal() 
     pl['CFBundleDisplayName'] = new_display_name 
-    print("Patching.... Pls wait")
+    print("Patching.... Please wait. It may take a while depending on the file size")
 
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
@@ -215,7 +216,7 @@ if option == 3:
     new_version = input("\nPlease enter your new App-Version: \n")
     clear_terminal()
     pl['CFBundleShortVersionString'] = new_version
-    print("Patching.... Pls wait") 
+    print("Patching.... Please wait. It may take a while depending on the file size") 
 
     with open(info_plist_path, 'wb') as fp: 
          plistlib.dump(pl, fp) 
@@ -260,7 +261,7 @@ if option == 4:
 
     icon_path = input("Enter the path to the .png you want to use as App-Icon:\n")
     clear_terminal()
-    print("Patching.... Pls wait") 
+    print("Patching.... Please wait. It may take a while depending on the file size") 
 
     with open(icon_path, 'rb') as fp:
         png_content = fp.read()
@@ -309,7 +310,7 @@ if option == 5:
 
     icon_path = input("Enter the path to the .png you want to use as App-Icon:\n")
     clear_terminal()
-    print("Patching.... Pls wait") 
+    print("Patching.... Please wait. It may take a while depending on the file size") 
 
     with open(icon_path, 'rb') as fp:
         png_content = fp.read()
@@ -362,7 +363,7 @@ if option == 6:
             shutil.copy(ipa_path, satella_jailed_folder)
             os.chdir(satella_jailed_folder)
             patchsh_path = satella_jailed_folder + "/patch.sh"
-            print("Patching.... Pls wait a few seconds\n")
+            print("Patching.... Please wait. It may take a while depending on the file size\n")
             #subprocess.run("chmod +x " + patchsh_path)
             process = subprocess.Popen(['sh', 'patch.sh'], stdout=subprocess.PIPE, text=True)
             while True:
@@ -682,7 +683,7 @@ if option == 12:
     clear_terminal()
     pl['cracked_by'] = cracked_by
 
-    print("Patching.... Pls wait")
+    print("Patching.... Please wait. It may take a while depending on the file size")
     clear_terminal()
 
     with open(info_plist_path, 'wb') as fp: 
@@ -691,12 +692,45 @@ if option == 12:
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
     print("Cracker name entry added")
+    
+    
+if option == 13:
+
+    zsign_path = input("Enter the path to the zsign executable:\n")
+    p12_path = input("Enter the path to the .p12 file:\n")
+    mobileprovision_path = input("Enter the path to the .mobileprovision file:\n")
+    password = input("Enter the password for the .p12 file:\n")
+    directory_path = input("Enter the directory containing the .ipa files:\n")
+    compression_level = 9
+
+    signed_directory = os.path.join(directory_path, 'signed')
+    if not os.path.exists(signed_directory):
+        os.makedirs(signed_directory)
+
+    files = os.listdir(directory_path)
+
+    ipa_files = [f for f in files if f.endswith('.ipa')]
+
+    for ipa_file in ipa_files:
+        ipa_path = os.path.join(directory_path, ipa_file)
+        output_file_name = os.path.splitext(ipa_file)[0] + '_signed.ipa'
+        output_path = os.path.join(signed_directory, output_file_name)
+
+        command = f'{zsign_path} -k "{p12_path}" -m "{mobileprovision_path}" -p "{password}" -o "{output_path}" -z {compression_level} "{ipa_path}"'
+
+        subprocess.run(command, shell=True)
+
+    print("All .ipa files have been processed!")
+
 
 if option == 14:
     
-    deb_to_ipa = input("Enter the .deb path")
+    deb_to_ipa = input("Enter the .deb path:\n")
+    clear_terminal()
     output_dir = input("Enter an output path for your new iPA:\n")
+    clear_terminal()
     deb_tmp = os.path.join(output_dir, "deb_tmp")
+    print("Patching.... Please wait. It may take a while depending on the file size")
 
     if not os.path.exists(deb_tmp):
         os.makedirs(deb_tmp)
@@ -714,16 +748,39 @@ if option == 14:
     if data_tar_file:
         patoolib.extract_archive(data_tar_file, outdir=deb_tmp, verbosity=-1)
         os.remove(data_tar_file)
+
     clear_terminal()
-    print("test")
-    deb_tmp_path = os.path.basename(file_path)[:-4]
-    deb_tmp_path = 
+    
+    apps_folder = os.path.join(deb_tmp, "Applications")
+    if os.path.exists(apps_folder) and os.path.isdir(apps_folder):
+        found_app_folder = False
+        
+        for folder_name in os.listdir(apps_folder):
+            if folder_name.endswith('.app'):
+                found_app_folder = True
+                app_name = folder_name[:-4]                
+                app_folder_path = os.path.join(apps_folder, folder_name)
+                zip_filename = app_folder_path + '.zip'
+                
+                with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                    for root, _, files in os.walk(app_folder_path):
+                        for file in files:
+                            absolute_file_path = os.path.join(root, file)
+                            zipf.write(absolute_file_path, os.path.relpath(absolute_file_path, apps_folder))
 
+                os.replace(zip_filename, os.path.join(output_dir, app_name + '.ipa'))
+                shutil.rmtree(deb_tmp)
+                clear_terminal()
+                print(f"'{folder_name}' has been zipped as '{app_name}.ipa' in the directory '{output_dir}'")
 
+        if not found_app_folder:
+            print("No '.app' folder found in the specified directory.")
 
+    else:
+        print("The specified path does not exist or is not a directory.")
+                    
+    
 
-
-
-if option >= 14:
+if option >= 15:
     print("Not a valid option. Try again.")
     sys.exit()
