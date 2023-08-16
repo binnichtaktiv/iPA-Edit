@@ -25,6 +25,10 @@ can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sidel
 
 [12] add your cracker name to a iPA (hidden)
 
+[13] sign and upload every iPA in a folder (paid/free certificate) - not working rn
+
+[14] .deb to .iPA (can create an .iPA from a .deb
+
 
 run `pip(3) install requests` first
 
