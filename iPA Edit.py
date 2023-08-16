@@ -121,6 +121,7 @@ print("[10] export .dylib(s) of an iPA")
 print("[11] change .dylib dependency")
 print("[12] add your cracker name to a iPA (hidden)")
 print("[13] sign and upload every iPA in a folder (paid/free certificate)")
+print("[14] .deb to .iPA (can create an .iPA from a .deb")
 
 option = int(input("Choose an option: \n"))
 clear_terminal() 
