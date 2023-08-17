@@ -9,7 +9,6 @@ import time
 import json
 import patoolib
 import requests
-import shlex
 
 payload_name = "Payload.zip" 
 filename = 'variable.pkl'
