@@ -693,8 +693,8 @@ if option == 12:
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
     print("Cracker name entry added")
-    
-    
+
+
 if option == 13:
 
     zsign_path = input("Enter the path to the zsign executable:\n")
@@ -725,7 +725,7 @@ if option == 13:
 
 
 if option == 14:
-    
+
     deb_to_ipa = input("Enter the .deb path:\n")
     clear_terminal()
     output_dir = input("Enter an output path for your new iPA:\n")
@@ -751,18 +751,18 @@ if option == 14:
         os.remove(data_tar_file)
 
     clear_terminal()
-    
+
     apps_folder = os.path.join(deb_tmp, "Applications")
     if os.path.exists(apps_folder) and os.path.isdir(apps_folder):
         found_app_folder = False
-        
+
         for folder_name in os.listdir(apps_folder):
             if folder_name.endswith('.app'):
                 found_app_folder = True
                 app_name = folder_name[:-4]                
                 app_folder_path = os.path.join(apps_folder, folder_name)
                 zip_filename = app_folder_path + '.zip'
-                
+
                 with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
                     for root, _, files in os.walk(app_folder_path):
                         for file in files:
@@ -779,8 +779,8 @@ if option == 14:
 
     else:
         print("The specified path does not exist or is not a directory.")
-                    
-    
+
+
 
 if option >= 15:
     print("Not a valid option. Try again.")
