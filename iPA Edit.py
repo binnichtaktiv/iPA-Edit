@@ -718,7 +718,7 @@ if option == 13:
 
         command = f'{zsign_path} -k "{p12_path}" -m "{mobileprovision_path}" -p "{password}" -o "{output_path}" -z {compression_level} "{ipa_path}"'
 
-        subprocess.run(command, shell=True)
+        subprocess.run(command, shell=True, check=True)
 
     print("All .ipa files have been processed!")
 
