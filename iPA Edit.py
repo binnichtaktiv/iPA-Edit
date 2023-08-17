@@ -76,7 +76,6 @@ def unzip_ipa(ipa_path):
 
     app_path = os.path.join(payload_path, app_folder)
     return app_path, file_name_no_ipa, zip_path, payload_path
-    print("gfdg")
 
                                                                                 #zip iPA
 
