@@ -287,7 +287,7 @@ if option == 4:
 
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
-    print("The App Icon was changed successfully.")
+    print("The Bundle ID and App Icon were changed successfully.")
 
 if option == 5:
 
