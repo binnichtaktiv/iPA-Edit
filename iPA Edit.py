@@ -43,7 +43,6 @@ def download_file(url, directory=None, new_filename="sideloadbypass1"):
     return new_file_path
 
 
-                                                                                #unzip iPA
 def unzip_ipa(ipa_path):
     clear_terminal()
     file_name_no_ipa = os.path.basename(ipa_path)[:-4]
@@ -76,7 +75,6 @@ def unzip_ipa(ipa_path):
     app_path = os.path.join(payload_path, app_folder)
     return app_path, file_name_no_ipa, zip_path, payload_path
 
-                                                                                #zip iPA
 
 def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
     payload_path2 = payload_path
@@ -113,7 +111,7 @@ print("[4] change App-Icon & App-Name")
 print("[5] change App Icon")
 print("[6] inject Satella Jailed")
 print("[7] inject Sideload Detection Bypass ")
-print("[8] inject .debs/.dylibs")
+print("[8] Azule - but a little bit easier")
 print("[9] update modded apps")
 print("[10] export .dylib(s) of an iPA")
 print("[11] change .dylib dependency")
@@ -456,38 +454,50 @@ if option == 8:
     try:
         result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
         if result.returncode == 0:
-            azule_ipa_input = input("Enter the path to the iPA you want to inject debs into: \n")
+            def find_files_in_directory(directory_path):
+                deb_dylib_paths = []
+                ipa_path = None
+                for filename in os.listdir(directory_path):
+                    file_path = os.path.join(directory_path, filename)
+
+                    if file_path.endswith(".deb") or file_path.endswith(".dylib"):
+                        deb_dylib_paths.append(file_path)
+                    elif file_path.endswith(".ipa") and ipa_path is None:
+                        ipa_path = file_path
+
+                return deb_dylib_paths, ipa_path
+
+            directory_path = input("Put all the tweaks and the iPA in one folder. iPA Edit will then detect all the debs and the iPA and run azule automatically\nPlease enter the path to the directory:\n")
             clear_terminal()
-            if os.path.isfile(azule_ipa_input):
-                print(".iPA file exists.\n\n")
-                time.sleep(4)
-                clear_terminal()
+            deb_dylib_paths, ipa_path = find_files_in_directory(directory_path)
+
+            output_path = input("Enter an output path or hit enter to save it in the current folder:\n")
+            clear_terminal()
+            output_name = input("Enter a name for your output iPA file. Hit enter for the default output name:\n")
+            clear_terminal()
+
+            if not output_path and ipa_path:
+                output_path = os.path.dirname(ipa_path)
+
+            deb_dylib_paths_string = " ".join(deb_dylib_paths)
+
+            if not output_name:
+                full_cmd = (
+                    f"azule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z"
+                )
             else:
-                print("Couldnt find .iPA file. Try again.")
-                sys.exit()
+                full_cmd = (
+                    f"azule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z -n {output_name}"
+                )
 
-            azule_ipa_output = input("Enter the output path for your modified .iPA: \n")
-            clear_terminal()
-            azule_ipa_output_name = input("Enter new name for the modified .iPA (without the .iPA at the end)\n")
-            clear_terminal()
-            file_paths = []
-            while True:
-                path = input("Enter path of the deb you want to inject (type 'ready' if you are done) \n")
-                if path == "done":
-                    break
-                clear_terminal()
-                file_paths.append(path)
+            subprocess.run(full_cmd, shell=True)
 
-            deb_paths = " ".join(file_paths)
-            terminal_command = f"azule -o '{azule_ipa_output}' -i '{azule_ipa_input}' -f '{deb_paths}' -z -n '{azule_ipa_output_name}'"
-
-            subprocess.run(terminal_command, shell=True, check=True)
-            clear_terminal()
-            print("Modified .iPA should be here:" + azule_ipa_output)
+            print("Modified .iPA should be here:" + output_path)
         else:
             print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
     except FileNotFoundError:
         print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+
 
 
 if option == 9:
