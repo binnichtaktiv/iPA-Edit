@@ -15,7 +15,7 @@ can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sidel
 
 [7] inject Sideload Detection Bypass
 
-[8] inject .debs/.dylibs
+[8] Azule - but a little bit easier
 
 [9] update modded apps
 
