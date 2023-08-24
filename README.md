@@ -30,7 +30,7 @@ can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sidel
 [14] .deb to .iPA (can create an .iPA from a .deb
 
 
-run `pip(3) install requests` first
+run `pip(3) install patool requests` first
 
 run `python3 iPA Edit.py`in Terminal
 
