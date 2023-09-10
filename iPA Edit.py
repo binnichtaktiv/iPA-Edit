@@ -119,7 +119,11 @@ print("[12] add your cracker name to a iPA (hidden)")
 print("[13] sign and upload every iPA in a folder (paid/free certificate)")
 print("[14] .deb to .iPA (can create an .iPA from a .deb")
 
-option = int(input("Choose an option: \n"))
+option = input("Choose an option: \n")
+if not option.isdigit():
+    print("Invalid input. Try again.")
+    sys.exit()
+option = int(option)
 clear_terminal() 
 
 if option == 0:
@@ -145,9 +149,16 @@ if option == 0:
     else:
         print(f"{filename} was downloaded successfully.")
 
-if option == 1: 
-
+if option == 1:
     ipa_path = input("Please enter the path to the IPA file:\n")
+    
+    # Pfad normalisieren und Anführungszeichen entfernen
+    ipa_path = os.path.normpath(ipa_path.strip('\'"'))
+    
+    # Überprüfen, ob der Pfad Leerzeichen enthält
+    if ' ' in ipa_path:
+        ipa_path = '"' + ipa_path + '"'
+
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
 
@@ -590,7 +601,6 @@ if option == 9:
 
 if option == 10:
 
-
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
@@ -603,14 +613,30 @@ if option == 10:
 
     if not dylib_files:
         print("Error: No .dylib files found in the IPA file.")
+        
+        os.rename(zip_path, zip_path.replace(".zip", ".ipa"))
+        
+        if os.path.exists(payload_path):
+            shutil.rmtree(payload_path)
+        
         sys.exit()
 
     print('found .dylibs:')
     for index, file in enumerate(dylib_files, start=1):
         print(f'{index}: {os.path.basename(file)}')
 
-    #clear_terminal()
-    selected_files = input('Enter the numbers of the files to be exported separated by commas:')
+    print("Enter 'exit' to exit without exporting.")
+    selected_files = input('Enter the numbers of the files to be exported separated by commas:\n')
+
+    if selected_files.strip().lower() == 'exit':
+        
+        os.rename(zip_path, zip_path.replace(".zip", ".ipa"))
+        
+        if os.path.exists(payload_path):
+            shutil.rmtree(payload_path)
+        
+        sys.exit()
+
     clear_terminal()
     selected_indices = [int(num.strip()) - 1 for num in selected_files.split(',')]
     selected_dylib_files = [dylib_files[index] for index in selected_indices]
@@ -623,12 +649,13 @@ if option == 10:
     for file in selected_dylib_files:
         shutil.copy(file, export_path)
 
-    shutil.rmtree(payload_path)
-    filename = os.path.basename(zip_path)
-    new_filename = os.path.splitext(filename)[0] + '.ipa'
-    new_path = os.path.join(os.path.dirname(zip_path), new_filename)
-    os.rename(zip_path, new_path)
-    print(".dylib(s) extracted sucessfully and should be here" + export_path + "now")
+    print('Exported .dylibs successfully')
+    
+    os.rename(zip_path, zip_path.replace(".zip", ".ipa"))
+    
+    if os.path.exists(payload_path):
+        shutil.rmtree(payload_path)
+
 
 if option == 11:
 
@@ -795,6 +822,6 @@ if option == 14:
 
 
 
-if option >= 15:
+else:
     print("Not a valid option. Try again.")
     sys.exit()
