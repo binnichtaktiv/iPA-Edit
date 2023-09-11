@@ -501,7 +501,7 @@ if option == 8:
                     f"azule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z -n {output_name}"
                 )
 
-            subprocess.run(full_cmd, shell=True)
+            subprocess.run(full_cmd, shell=True, check=True)
 
             print("Modified .iPA should be here:" + output_path)
         else:
