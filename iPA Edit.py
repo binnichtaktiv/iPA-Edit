@@ -151,14 +151,6 @@ if option == 0:
 
 if option == 1:
     ipa_path = input("Please enter the path to the IPA file:\n")
-    
-    # Pfad normalisieren und Anführungszeichen entfernen
-    ipa_path = os.path.normpath(ipa_path.strip('\'"'))
-    
-    # Überprüfen, ob der Pfad Leerzeichen enthält
-    if ' ' in ipa_path:
-        ipa_path = '"' + ipa_path + '"'
-
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
 
