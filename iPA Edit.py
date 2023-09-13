@@ -10,10 +10,8 @@ import json
 import patoolib
 import requests
 
+json_file_path = "iPAEditdata.json"
 payload_name = "Payload.zip" 
-filename = 'variable.pkl'
-data_file_path = "list_data.json"
-sideload_detection_paths = 'sideload_detection_paths.pkl'
 
 
 def clear_terminal():
@@ -120,7 +118,7 @@ print("[13] sign and upload every iPA in a folder (paid/free certificate)")
 print("[14] .deb to .iPA (can create an .iPA from a .deb")
 
 option = input("Choose an option: \n")
-if not option.isdigit():
+if not option.isdigit() or not (0 <= int(option) <= 14):
     print("Invalid input. Try again.")
     sys.exit()
 option = int(option)
@@ -387,7 +385,7 @@ if option == 7:
         result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
         if result.returncode == 0:
             try:
-                with open('sideload_detection_paths.pkl', 'rb') as f:
+                with open('iPAEditdata.json', 'rb') as f:
                     sideload_detection_paths = pickle.load(f)
             except FileNotFoundError:
                 url1 = "https://github.com/binnichtaktiv/iPA-Edit/raw/main/bypasses/Sideloadbypass1.dylib"
@@ -402,7 +400,7 @@ if option == 7:
                 sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
                                             'sideload_bypass2': sideload_bypass2,
                                             'sideloadly_bypass': sideloadly_bypass}
-                with open('sideload_detection_paths.pkl', 'wb') as f:
+                with open('iPAEditdata.json', 'wb') as f:
                     pickle.dump(sideload_detection_paths, f)
 
                 clear_terminal()
@@ -504,7 +502,7 @@ if option == 8:
 
 
 if option == 9:
-    data_file_path = "azulelist_data.json"
+    data_file_path = "azuleiPAEditdata.json"
     list_data = []
     if os.path.exists(data_file_path):
         with open(data_file_path, "r") as data_file:
@@ -811,9 +809,3 @@ if option == 14:
 
     else:
         print("The specified path does not exist or is not a directory.")
-
-
-
-else:
-    print("Not a valid option. Try again.")
-    sys.exit()
