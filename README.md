@@ -1,39 +1,57 @@
-# iPA-Edit
-can change Bundle-ID, App-Name and App-Icon, inject Satella Jailed, inject Sideload Detection Bypass,  inject .debs/.dylibs,  update modded apps,  export .dylib(s) of an iPA, change .dylib dependency, add a cracker name (hidden) - i will keep adding more
+# iPA Edit
 
-[1] change Bundle-ID
+iPA Edit is a Python script for modifying and resigning iOS IPA files. It allows you to easily change various attributes of an IPA such as the bundle ID, app name, app icon, inject tweaks, and more.
 
-[2] change App-Name
+## Features
 
-[3] change App-Version
+- Download IPAs directly via URL
+- Change bundle ID
+- Change app name
+- Change app version
+- Change app icon
+- Inject Satella jailbreak  
+- Inject sideload detection bypasses
+- Simplified Azule IPA patching
+- Update modded IPAs
+- Export .dylib files from IPA
+- Change .dylib dependencies
+- Add hidden cracker name to IPA
+- Sign and upload IPAs in bulk
+- Convert .deb to .ipa
 
-[4] change App-Icon & App-Name
+## Requirements
 
-[5] change App Icon
+- Python 3
+- Azule (for some functions)
+- zsign (for bulk signing)
 
-[6] inject Satella Jailed
+## Installation
 
-[7] inject Sideload Detection Bypass
+1. Install Python 3 if not already installed
 
-[8] Azule - but a little bit easier
+2. Clone this repository:
 
-[9] update modded apps
+3. Install dependencies: ```pip3 install patool requests```
 
-[10] export .dylib(s) of an iPA
+4. Install [Azule](https://github.com/Al4ise/Azule) for IPA patching functions
 
-[11] change .dylib dependency
+5. Install [zsign](https://github.com/zcutil/zsign) for bulk signing IPAs (not finished)
 
-[12] add your cracker name to a iPA (hidden)
-
-[13] sign and upload every iPA in a folder (paid/free certificate) - not working rn
-
-[14] .deb to .iPA (can create an .iPA from a .deb
+6. Run the script: ```python3 iPA Edit.py```
 
 
-run `pip(3) install patool requests` first
+## Usage
 
-run `python3 iPA Edit.py`in Terminal
+Run the script and follow the prompts to choose the desired option. Most options will ask you to provide an IPA file path and make changes as needed.
 
-you have to install azule, Satella etc manually 
+- For downloading IPAs, provide a direct URL when prompted
 
-You can put the .py file in your home folder or user folder so that you can just do `python(3) "iPA Edit.py"` 
+- For bulk resigning, provide paths to certificate, mobileprovision, and a folder with IPAs  
+
+- For Satella and bypass injection, have the necessary files downloaded already
+
+- For Azule functions, ensure Azule is installed and in PATH
+
+The script will output new files to the same folder as the input IPA by default. Provide custom output paths when prompted if needed.
+
+Some options like app name, bundle ID, icon etc. directly modify the IPA plist. Others like Satella injection use Azule to rebuild a new IPA.
