@@ -18,6 +18,8 @@ iPA Edit is a Python script for modifying and resigning iOS IPA files. It allows
 - Add hidden cracker name to IPA
 - Sign and upload IPAs in bulk | not working rn
 - Convert .deb to .ipa
+- Enable file sharing
+
 
 ## Requirements
 
