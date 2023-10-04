@@ -16,14 +16,14 @@ iPA Edit is a Python script for modifying and resigning iOS IPA files. It allows
 - Export .dylib files from IPA
 - Change .dylib dependencies
 - Add hidden cracker name to IPA
-- Sign and upload IPAs in bulk
+- Sign and upload IPAs in bulk | not working rn
 - Convert .deb to .ipa
 
 ## Requirements
 
 - Python 3
 - Azule (for some functions)
-- zsign (for bulk signing)
+- zsign (for bulk signing) | not working rn
 
 ## Installation
 
@@ -46,9 +46,7 @@ Run the script and follow the prompts to choose the desired option. Most options
 
 - For downloading IPAs, provide a direct URL when prompted
 
-- For bulk resigning, provide paths to certificate, mobileprovision, and a folder with IPAs  
-
-- For Satella and bypass injection, have the necessary files downloaded already
+- For bulk resigning, provide paths to certificate, mobileprovision, and a folder with IPAs  | not working rn
 
 - For Azule functions, ensure Azule is installed and in PATH
 
