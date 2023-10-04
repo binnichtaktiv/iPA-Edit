@@ -116,9 +116,10 @@ print("[11] change .dylib dependency")
 print("[12] add your cracker name to a iPA (hidden)")
 print("[13] sign and upload every iPA in a folder (paid/free certificate)")
 print("[14] .deb to .iPA (can create an .iPA from a .deb")
+print("[15] enable file sharing")
 
 option = input("Choose an option: \n")
-if not option.isdigit() or not (0 <= int(option) <= 14):
+if not option.isdigit() or not (0 <= int(option) <= 15):
     print("Invalid input. Try again.")
     sys.exit()
 option = int(option)
@@ -809,3 +810,23 @@ if option == 14:
 
     else:
         print("The specified path does not exist or is not a directory.")
+        
+if option == 15:
+    
+    ipa_path = input("Please enter the path to the IPA file:\n")
+    clear_terminal()
+    app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
+
+    info_plist_path = os.path.join(app_path, "Info.plist") 
+    with open(info_plist_path, 'rb') as fp: 
+        pl = plistlib.load(fp) 
+
+    pl['LSSupportsOpeningDocumentsInPlace'] = True
+    pl['UIFileSharingEnabled'] = True
+
+    with open(info_plist_path, 'wb') as fp: 
+        plistlib.dump(pl, fp) 
+
+    zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
+    clear_terminal()
+    print("The App Name was changed successfully.")
