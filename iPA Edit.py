@@ -3,16 +3,10 @@ import sys
 import zipfile 
 import plistlib 
 import shutil
-import pickle
 import subprocess
 import time
-import json
 import patoolib
 import requests
-
-json_file_path = "iPAEditdata.json"
-payload_name = "Payload.zip" 
-
 
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -99,8 +93,6 @@ def zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path):
     shutil.rmtree(payload_path)
     os.remove(zip_path)
 
-                                                                                #start
-
 print("\n[0] download iPAs via direct URL")
 print("[1] change Bundle-ID") 
 print("[2] change App-Name") 
@@ -108,14 +100,12 @@ print("[3] change App-Version")
 print("[4] change App-Icon & App-Name")
 print("[5] change App Icon")
 print("[6] inject Satella Jailed")
-print("[7] inject Sideload Detection Bypass ")
-print("[8] pyzule - but a little bit easier")
-print("[9] export .dylib(s) of an iPA")
-print("[10] change .dylib dependency")
-print("[11] add your cracker name to a iPA (hidden)")
-print("[12] sign and upload every iPA in a folder (paid/free certificate)")
-print("[13] .deb to .iPA (can create an .iPA from a .deb")
-print("[14] enable file sharing")
+print("[7] export .dylib(s) of an iPA")
+print("[8] change .dylib dependency")
+print("[9] add your cracker name to a iPA (hidden)")
+print("[10] sign and upload every iPA in a folder (paid/free certificate)")
+print("[11] .deb to .iPA (can create an .iPA from a .deb")
+print("[12] enable file sharing")
 
 option = input("Choose an option: \n")
 if not option.isdigit() or not (0 <= int(option) <= 15):
@@ -179,8 +169,6 @@ if option == 1:
     zip_ipa(ipa_path, app_path, file_name_no_ipa, payload_path)
     clear_terminal()
     print("The Bundle ID was changed successfully.")
-
-    #shutil.rmtree()
 
 if option == 2: 
 
@@ -303,7 +291,7 @@ if option == 5:
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
 
-    directory = app_path # aktuellen ordner 
+    directory = app_path
     for filename in os.listdir(directory): 
         if filename.startswith("AppIcon") and filename.endswith(".png"): 
             file_path = os.path.join(directory, filename) 
@@ -329,8 +317,6 @@ if option == 5:
             fp.write(png_content)
 
     plist_path = os.path.join(app_path, "Info.plist")
-
-    #edit plist
 
     with open(plist_path, 'rb') as fp:
         plist = plistlib.load(fp)
@@ -373,10 +359,10 @@ if option == 6:
             real_output_dir = os.path.join(output_dir, ipa_fname + "_satella")
             
             clear_terminal()
-            inj_satella = subprocess.run(["pyzule", "-o", output_dir, "-i", ipa_path, "-f", filename, "-c", "9"])
+            inj_satella = subprocess.run(["pyzule", "-o", real_output_dir, "-i", ipa_path, "-f", filename, "-c", "9"])
             print("Patching.... Please wait. It may take a while depending on the file size\n")
             clear_terminal()
-            print(".iPA file with Satella injected should be here: " + real_output_dir)
+            print(".iPA file with Satella injected should be here: " + output_dir)
         else:
             print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
     except FileNotFoundError:
@@ -386,127 +372,6 @@ if option == 6:
 
 
 if option == 7:
-    program = "pyzule"
-    try:
-        result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
-        if result.returncode == 0:
-            try:
-                with open('iPAEditdata.json', 'rb') as f:
-                    sideload_detection_paths = pickle.load(f)
-            except FileNotFoundError:
-                url1 = "https://github.com/binnichtaktiv/iPA-Edit/raw/main/bypasses/Sideloadbypass1.dylib"
-                sideload_bypass1 = download_file(url1, new_filename="sideloadbypass1")
-
-                url2 = "https://github.com/binnichtaktiv/iPA-Edit/raw/main/bypasses/Sideloadbypass2.dylib"
-                sideload_bypass2 = download_file(url2, new_filename="sideloadbypass2")
-
-                url3 = "https://github.com/binnichtaktiv/iPA-Edit/raw/main/bypasses/SideloadSpoofer-08.dylib"
-                sideloadly_bypass = download_file(url3, new_filename="sideloadlybypass")
-
-                sideload_detection_paths = {'sideload_bypass1': sideload_bypass1,
-                                            'sideload_bypass2': sideload_bypass2,
-                                            'sideloadly_bypass': sideloadly_bypass}
-                with open('iPAEditdata.json', 'wb') as f:
-                    pickle.dump(sideload_detection_paths, f)
-
-                clear_terminal()
-                print("Permanently saved the paths to the sideload detection bypass .dylibs so you don't have to enter them everytime..")
-                time.sleep(3)
-                clear_terminal()
-
-            sideload_bypass1 = sideload_detection_paths.get('sideload_bypass1')
-            sideload_bypass2 = sideload_detection_paths.get('sideload_bypass2')
-            sideloadly_bypass = sideload_detection_paths.get('sideloadly_bypass')
-
-            sideload_detection_bypass_ipa = input("Enter the path to the iPA where you want to bypass the sideload detection:\n")
-            clear_terminal()
-            sideload_detection_bypass_ipa_output = input("Enter an output path:\n")
-            clear_terminal()
-            sideload_detection_bypass_ipa_output_name = input("Enter a name for the patched iPA:\n")
-            clear_terminal()
-
-            bypass_selection = int(input("Which bypass do you want to use?\n[1] Sideloadbypass1 & Sideloadbypass2 \n[2] SideloadDetection-05/6\n[3] Sideloadbypass1 & Sideloadbypass2 & Sideloadly Bypass\n"))
-            clear_terminal()
-
-            if bypass_selection == 1:
-                pyzule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
-                pyzule_cmd = f"pyzule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {pyzule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(pyzule_cmd, shell=True, check=True)
-                clear_terminal()
-                print("Modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
-
-            elif bypass_selection == 2:
-                pyzule_cmd = f"pyzule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(pyzule_cmd, shell=True, check=True)
-                clear_terminal()
-                print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
-
-            elif bypass_selection == 3: 
-                pyzule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2 + " " + sideloadly_bypass
-                pyzule_cmd = f"pyzule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {pyzule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(pyzule_cmd, shell=True, check=True)
-                clear_terminal()
-                print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
-
-            else:
-                print("Not a valid option... Try again")
-                sys.exit()
-        else:
-            print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
-    except FileNotFoundError:
-        print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
-
-if option == 8:
-    program = "pyzule"
-    try:
-        result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
-        if result.returncode == 0:
-            def find_files_in_directory(directory_path):
-                deb_dylib_paths = []
-                ipa_path = None
-                for filename in os.listdir(directory_path):
-                    file_path = os.path.join(directory_path, filename)
-
-                    if file_path.endswith(".deb") or file_path.endswith(".dylib"):
-                        deb_dylib_paths.append(file_path)
-                    elif file_path.endswith(".ipa") and ipa_path is None:
-                        ipa_path = file_path
-
-                return deb_dylib_paths, ipa_path
-
-            directory_path = input("Put all the tweaks and the iPA in one folder. iPA Edit will then detect all the debs and the iPA and run pyzule automatically\nPlease enter the path to the directory:\n")
-            clear_terminal()
-            deb_dylib_paths, ipa_path = find_files_in_directory(directory_path)
-
-            output_path = input("Enter an output path or hit enter to save it in the current folder:\n")
-            clear_terminal()
-            output_name = input("Enter a name for your output iPA file. Hit enter for the default output name:\n")
-            clear_terminal()
-
-            if not output_path and ipa_path:
-                output_path = os.path.dirname(ipa_path)
-
-            deb_dylib_paths_string = " ".join(deb_dylib_paths)
-
-            if not output_name:
-                full_cmd = (
-                    f"pyzule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z"
-                )
-            else:
-                full_cmd = (
-                    f"pyzule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z -n {output_name}"
-                )
-
-            subprocess.run(full_cmd, shell=True, check=True)
-
-            print("Modified .iPA should be here:" + output_path)
-        else:
-            print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
-    except FileNotFoundError:
-        print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
-
-
-if option == 9:
 
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
@@ -564,7 +429,7 @@ if option == 9:
         shutil.rmtree(payload_path)
 
 
-if option == 10:
+if option == 8:
 
     file_path = input("Enter path to .dylib: ")
 
@@ -618,7 +483,7 @@ if option == 10:
         print("This is not a .dylib file! Try again")
         sys.exit()
 
-if option == 11:
+if option == 9:
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
@@ -642,7 +507,7 @@ if option == 11:
     print("Cracker name entry added")
 
 
-if option == 12:
+if option == 10:
 
     zsign_path = input("Enter the path to the zsign executable:\n")
     p12_path = input("Enter the path to the .p12 file:\n")
@@ -671,7 +536,7 @@ if option == 12:
     print("All .ipa files have been processed!")
 
 
-if option == 13:
+if option == 11:
 
     deb_to_ipa = input("Enter the .deb path:\n")
     clear_terminal()
@@ -727,7 +592,7 @@ if option == 13:
     else:
         print("The specified path does not exist or is not a directory.")
         
-if option == 14:
+if option == 12:
     
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
