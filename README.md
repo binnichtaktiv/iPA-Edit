@@ -10,9 +10,6 @@ iPA Edit is a Python script for modifying and resigning iOS IPA files. It allows
 - Change app version
 - Change app icon
 - Inject Satella jailbreak  
-- Inject sideload detection bypasses
-- Simplified Azule IPA patching
-- Update modded IPAs
 - Export .dylib files from IPA
 - Change .dylib dependencies
 - Add hidden cracker name to IPA
