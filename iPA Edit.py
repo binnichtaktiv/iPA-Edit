@@ -109,14 +109,13 @@ print("[4] change App-Icon & App-Name")
 print("[5] change App Icon")
 print("[6] inject Satella Jailed")
 print("[7] inject Sideload Detection Bypass ")
-print("[8] Azule - but a little bit easier")
-print("[9] update modded apps")
-print("[10] export .dylib(s) of an iPA")
-print("[11] change .dylib dependency")
-print("[12] add your cracker name to a iPA (hidden)")
-print("[13] sign and upload every iPA in a folder (paid/free certificate)")
-print("[14] .deb to .iPA (can create an .iPA from a .deb")
-print("[15] enable file sharing")
+print("[8] pyzule - but a little bit easier")
+print("[9] export .dylib(s) of an iPA")
+print("[10] change .dylib dependency")
+print("[11] add your cracker name to a iPA (hidden)")
+print("[12] sign and upload every iPA in a folder (paid/free certificate)")
+print("[13] .deb to .iPA (can create an .iPA from a .deb")
+print("[14] enable file sharing")
 
 option = input("Choose an option: \n")
 if not option.isdigit() or not (0 <= int(option) <= 15):
@@ -125,10 +124,13 @@ if not option.isdigit() or not (0 <= int(option) <= 15):
 option = int(option)
 clear_terminal() 
 
+from tqdm import tqdm
+from requests_toolbelt.multipart.encoder import MultipartEncoder, MultipartEncoderMonitor
+
 if option == 0:
-    url = input("enter a direct download URL: ")
+    url = input("Enter a direct download URL: ")
     clear_terminal()
-    filename = input("enter a name for the downloaded file:")
+    filename = input("Enter a name for the downloaded file: ")
     clear_terminal()
 
     response = requests.get(url, stream=True)
@@ -136,17 +138,23 @@ if option == 0:
     block_size = 1024
     downloaded_size = 0
 
-    with open(filename, "wb") as f:
+    with open(filename, "wb") as f, tqdm(
+        desc=f"Downloading {filename}",
+        total=total_size,
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+    ) as pbar:
         for data in response.iter_content(block_size):
             downloaded_size += len(data)
             f.write(data)
-            progress = downloaded_size / total_size * 100
-            print(f"Download progres: {progress:.2f}%", end="\r")
+            pbar.update(len(data))
 
     if total_size != 0 and downloaded_size != total_size:
-        print("failed to download.")
+        print("Failed to download.")
     else:
         print(f"{filename} was downloaded successfully.")
+
 
 if option == 1:
     ipa_path = input("Please enter the path to the IPA file:\n")
@@ -340,48 +348,45 @@ if option == 5:
     clear_terminal()
     print("App Icon was changed successfully.")
 
+filename = " "
+import tempfile
+
 if option == 6:
-    program = "azule"
+    temp_folder = tempfile.mkdtemp()
+    filename = os.path.join(temp_folder, "SatellaJailed.dylib")
+    satella_url = "https://github.com/Paisseon/SatellaJailed/raw/emt/SatellaJailed.dylib"
+    response = requests.get(satella_url, stream=True)
+    with open(filename, 'wb') as f:
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
+    program = "pyzule"
     try:
         result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
         if result.returncode == 0:
-            try:
-                with open(filename, 'rb') as f:
-                    satella_jailed_folder = pickle.load(f)
-            except FileNotFoundError:
-                satella_jailed_folder = input("Enter the folder where Satella Jailed was downloaded: \n")
-                clear_terminal()
-                with open(filename, 'wb') as f:
-                    pickle.dump(satella_jailed_folder, f)
-                print("Created permanent variable for your Satella path.\n")
-                time.sleep(4)
-                clear_terminal()
-
-            ipa_path = input("Enter the path of the .iPA you want to inject Satella to: \n")
+            satella_jailed_folder = temp_folder
+            ipa_path = input("Enter the path of the .iPA you want to inject Satella to:\n")
             clear_terminal()
-            shutil.copy(ipa_path, satella_jailed_folder)
-            os.chdir(satella_jailed_folder)
-            patchsh_path = satella_jailed_folder + "/patch.sh"
+            ipa_fname = os.path.splitext(os.path.basename(ipa_path))[0]
+            
+            output_dir = input(f"Enter an output path for your new patched iPA:\n")
+            real_output_dir = os.path.join(output_dir, ipa_fname + "_satella")
+            
+            clear_terminal()
+            inj_satella = subprocess.run(["pyzule", "-o", output_dir, "-i", ipa_path, "-f", filename, "-c", "9"])
             print("Patching.... Please wait. It may take a while depending on the file size\n")
-            #subprocess.run("chmod +x " + patchsh_path)
-            process = subprocess.Popen(['sh', 'patch.sh'], stdout=subprocess.PIPE, text=True)
-            while True:
-                output = process.stdout.readline()
-                if output == '' and process.poll() is not None:
-                    break
-                if output:
-                    print(output.strip())
-            process.communicate()
             clear_terminal()
-            print(".iPA file with Satella injected should be here: " + satella_jailed_folder)
+            print(".iPA file with Satella injected should be here: " + real_output_dir)
         else:
-            print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+            print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
     except FileNotFoundError:
-        print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+        print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
+
+    shutil.rmtree(temp_folder)
 
 
 if option == 7:
-    program = "azule"
+    program = "pyzule"
     try:
         result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
         if result.returncode == 0:
@@ -424,22 +429,22 @@ if option == 7:
             clear_terminal()
 
             if bypass_selection == 1:
-                azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
-                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True, check=True)
+                pyzule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2
+                pyzule_cmd = f"pyzule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {pyzule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(pyzule_cmd, shell=True, check=True)
                 clear_terminal()
                 print("Modified .iPA should be here:" + sideload_detection_bypass_ipa_output)
 
             elif bypass_selection == 2:
-                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True, check=True)
+                pyzule_cmd = f"pyzule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {sideloadly_bypass} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(pyzule_cmd, shell=True, check=True)
                 clear_terminal()
                 print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
 
             elif bypass_selection == 3: 
-                azule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2 + " " + sideloadly_bypass
-                azule_cmd = f"azule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {azule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
-                subprocess.run(azule_cmd, shell=True, check=True)
+                pyzule_cmd_prep = sideload_bypass1 + " " + sideload_bypass2 + " " + sideloadly_bypass
+                pyzule_cmd = f"pyzule -o '{sideload_detection_bypass_ipa_output}' -i '{sideload_detection_bypass_ipa}' -f {pyzule_cmd_prep} -z -n {sideload_detection_bypass_ipa_output_name}"
+                subprocess.run(pyzule_cmd, shell=True, check=True)
                 clear_terminal()
                 print("Modified .iPA should be here: " + sideload_detection_bypass_ipa_output)
 
@@ -447,12 +452,12 @@ if option == 7:
                 print("Not a valid option... Try again")
                 sys.exit()
         else:
-            print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+            print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
     except FileNotFoundError:
-        print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+        print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
 
 if option == 8:
-    program = "azule"
+    program = "pyzule"
     try:
         result = subprocess.run([program, "-h"], capture_output=True, text=True, check=True)
         if result.returncode == 0:
@@ -469,7 +474,7 @@ if option == 8:
 
                 return deb_dylib_paths, ipa_path
 
-            directory_path = input("Put all the tweaks and the iPA in one folder. iPA Edit will then detect all the debs and the iPA and run azule automatically\nPlease enter the path to the directory:\n")
+            directory_path = input("Put all the tweaks and the iPA in one folder. iPA Edit will then detect all the debs and the iPA and run pyzule automatically\nPlease enter the path to the directory:\n")
             clear_terminal()
             deb_dylib_paths, ipa_path = find_files_in_directory(directory_path)
 
@@ -485,112 +490,23 @@ if option == 8:
 
             if not output_name:
                 full_cmd = (
-                    f"azule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z"
+                    f"pyzule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z"
                 )
             else:
                 full_cmd = (
-                    f"azule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z -n {output_name}"
+                    f"pyzule -o {output_path} -i {ipa_path} -f {deb_dylib_paths_string} -z -n {output_name}"
                 )
 
             subprocess.run(full_cmd, shell=True, check=True)
 
             print("Modified .iPA should be here:" + output_path)
         else:
-            print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
+            print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
     except FileNotFoundError:
-        print("Azule is not installed! Install it first. https://github.com/Al4ise/Azule")
-
+        print("pyzule is not installed! Install it first. https://github.com/asdfzxcvbn/pyzule")
 
 
 if option == 9:
-    data_file_path = "azuleiPAEditdata.json"
-    list_data = []
-    if os.path.exists(data_file_path):
-        with open(data_file_path, "r") as data_file:
-            list_data = json.load(data_file)
-
-    while True:
-        action = input("What do you want to?\n [1] add a new app \n [2] remove an app \n [3] use an existing app \n [4] exit\n")
-        clear_terminal()
-
-        if action.lower() == "1":
-            clear_terminal()
-            name = input("Enter a name for the app you want to save the paths for: \n")
-            clear_terminal()
-
-            debs_paths = []
-            while True:
-                debs_path = input("Enter the deb path(s) for the new app, or type 'done' to finish: \n")
-                if debs_path.lower() == "done":
-                    clear_terminal()
-                    break
-                debs_paths.append(debs_path)
-                clear_terminal()
-
-            new_item = {
-                "name": name,
-                "debs_path": debs_paths,
-            }
-            list_data.append(new_item)
-            with open(data_file_path, "w") as data_file:
-                json.dump(list_data, data_file)
-
-        elif action.lower() == "2":
-            print("List of items:")
-            for i, item in enumerate(list_data):
-                print(f"{i}: {item['name']}")
-
-            item_index = input("Enter the number of the app you want to remove: \n")
-            clear_terminal()
-            try:
-                item_index = int(item_index)
-                item = list_data[item_index]
-                del list_data[item_index]
-                print(f"App '{item['name']}' has been removed from the list.")
-                clear_terminal()
-            except:
-                clear_terminal()
-                print("Invalid input, please try again.")
-
-
-            with open(data_file_path, "w") as data_file:
-                json.dump(list_data, data_file)
-
-        elif action.lower() == "4":
-            sys.exit()
-
-        elif action.lower() == "3":
-            print("List of items:")
-            for i, item in enumerate(list_data):
-                print(f"{i}: {item['name']}")
-
-            item_index = input("Enter the number of the item you want to use: \n")
-            clear_terminal()
-            try:
-                item_index = int(item_index)
-                item = list_data[item_index]
-                break
-            except:
-                clear_terminal()
-                print("Invalid input, please try again.")
-
-        else:
-            clear_terminal()
-            print("Invalid input, please try again.")
-
-    ipa_path_for_azulelist = input("Enter the iPA path to the new iPA: \n")
-    clear_terminal()
-    new_ipa_name = input("Enter a name for the patched iPA: \n")
-    clear_terminal()
-    output_path_azulelist = input("Enter a output path: \n")
-    clear_terminal()
-
-    debs_paths_str = ' '.join(item['debs_path'])
-    command = f"azule -o '{output_path_azulelist}' -i '{ipa_path_for_azulelist}' -f {debs_paths_str} -z -n {new_ipa_name}"
-    os.system(command)
-    print("App was patched successfully.")
-
-if option == 10:
 
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
@@ -648,7 +564,7 @@ if option == 10:
         shutil.rmtree(payload_path)
 
 
-if option == 11:
+if option == 10:
 
     file_path = input("Enter path to .dylib: ")
 
@@ -702,7 +618,7 @@ if option == 11:
         print("This is not a .dylib file! Try again")
         sys.exit()
 
-if option == 12:
+if option == 11:
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
     app_path, file_name_no_ipa, zip_path, payload_path = unzip_ipa(ipa_path)
@@ -726,7 +642,7 @@ if option == 12:
     print("Cracker name entry added")
 
 
-if option == 13:
+if option == 12:
 
     zsign_path = input("Enter the path to the zsign executable:\n")
     p12_path = input("Enter the path to the .p12 file:\n")
@@ -755,7 +671,7 @@ if option == 13:
     print("All .ipa files have been processed!")
 
 
-if option == 14:
+if option == 13:
 
     deb_to_ipa = input("Enter the .deb path:\n")
     clear_terminal()
@@ -811,7 +727,7 @@ if option == 14:
     else:
         print("The specified path does not exist or is not a directory.")
         
-if option == 15:
+if option == 14:
     
     ipa_path = input("Please enter the path to the IPA file:\n")
     clear_terminal()
