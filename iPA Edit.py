@@ -535,9 +535,7 @@ if option == 10:
 
     print("All .ipa files have been processed!")
 
-
 if option == 11:
-
     deb_to_ipa = input("Enter the .deb path:\n")
     clear_terminal()
     output_dir = input("Enter an output path for your new iPA:\n")
@@ -562,8 +560,6 @@ if option == 11:
         patoolib.extract_archive(data_tar_file, outdir=deb_tmp, verbosity=-1)
         os.remove(data_tar_file)
 
-    clear_terminal()
-
     apps_folder = os.path.join(deb_tmp, "Applications")
     if os.path.exists(apps_folder) and os.path.isdir(apps_folder):
         found_app_folder = False
@@ -573,13 +569,16 @@ if option == 11:
                 found_app_folder = True
                 app_name = folder_name[:-4]                
                 app_folder_path = os.path.join(apps_folder, folder_name)
-                zip_filename = app_folder_path + '.zip'
+                payload_folder_path = os.path.join(deb_tmp, "Payload")
+                os.makedirs(payload_folder_path, exist_ok=True)
+                shutil.copytree(app_folder_path, os.path.join(payload_folder_path, folder_name))
+                zip_filename = payload_folder_path + '.zip'
 
                 with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                    for root, _, files in os.walk(app_folder_path):
+                    for root, _, files in os.walk(payload_folder_path):
                         for file in files:
                             absolute_file_path = os.path.join(root, file)
-                            zipf.write(absolute_file_path, os.path.relpath(absolute_file_path, apps_folder))
+                            zipf.write(absolute_file_path, os.path.relpath(absolute_file_path, deb_tmp))
 
                 os.replace(zip_filename, os.path.join(output_dir, app_name + '.ipa'))
                 shutil.rmtree(deb_tmp)
@@ -591,6 +590,7 @@ if option == 11:
 
     else:
         print("The specified path does not exist or is not a directory.")
+
         
 if option == 12:
     
