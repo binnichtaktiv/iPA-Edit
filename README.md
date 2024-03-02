@@ -30,7 +30,7 @@ iPA Edit is a Python script for modifying and resigning iOS IPA files. It allows
 
 2. Clone this repository:
 
-3. Install dependencies: ```pip3 install patool requests```
+3. Install dependencies: ```pip3 install patool requests requests-toolbelt tqdm```
 
 4. Install [Azule](https://github.com/Al4ise/Azule) for IPA patching functions
 
