@@ -178,14 +178,22 @@ if option == 2:
 
     info_plist_path = os.path.join(app_path, "Info.plist") 
     with open(info_plist_path, 'rb') as fp: 
-            pl = plistlib.load(fp) 
+        pl = plistlib.load(fp) 
 
-    old_display_name = pl['CFBundleDisplayName'] 
-    print("Current App-Name: ", old_display_name) 
+    if 'CFBundleDisplayName' in pl:
+        app_display_name = pl['CFBundleDisplayName']
+    else:
+        app_display_name = pl.get('CFBundleName')
+
+    print("Current App-Name: ", app_display_name)
 
     new_display_name = input("Please enter your new App-Name: \n")
     clear_terminal() 
-    pl['CFBundleDisplayName'] = new_display_name 
+    if 'CFBundleDisplayName' in pl:
+            pl['CFBundleDisplayName'] = new_display_name 
+    else:
+        pl['CFBundleName'] = new_display_name 
+
     print("Patching.... Please wait. It may take a while depending on the file size")
 
     with open(info_plist_path, 'wb') as fp: 
