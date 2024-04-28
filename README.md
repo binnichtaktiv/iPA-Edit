@@ -41,7 +41,9 @@ options:
   -p app icon     change app icon
   -f              enable document browser
   -d              export .dylib(s) that are injected in that iPA
-  -s              sign iPA(s) with a certificate
+  -s              sign iPA(s) with a certificate (If you only want to sign one iPA, enter the
+                  path of the iPA in -i, but if it is a folder with several iPAs, then enter the
+                  folder that contains all the iPAs in -i)
   -e              .deb to .iPA (only works if the .deb has a Payload folder, for example Kodi)
   -k              keep source iPA/deb
 ```
