@@ -8,7 +8,7 @@ import patoolib
 import argparse
 from PIL import Image
 
-parser = argparse.ArgumentParser(description="iPA Edit is a Python script for modifying iPA files. It allows you to easily change various attributes of an IPA such as the bundle ID, app name, app icon, inject tweaks, and more.")
+parser = argparse.ArgumentParser(description="iPA Edit is a Python script for modifying iPA files.")
 parser.add_argument("-i", metavar="input", type=str, required=True,
                     help="the .ipa/.deb to patch")
 parser.add_argument("-o", metavar="output", type=str, required=True,
@@ -26,7 +26,7 @@ parser.add_argument("-f",action="store_true",
 parser.add_argument("-d", action="store_true",
                     help="export .dylib(s) that are injected in that iPA")
 parser.add_argument("-s", action="store_true",
-                    help="sign iPA(s) with a certificate")
+                    help="sign iPA(s) with a certificate (If you only want to sign one iPA, enter the path of the iPA in -i, but if it is a folder with several iPAs, then enter the folder that contains all the iPAs in -i)")
 parser.add_argument("-e", action="store_true",
                     help=".deb to .iPA (only works if the .deb has a Payload folder, for example Kodi)")
 parser.add_argument("-k", action="store_true",
