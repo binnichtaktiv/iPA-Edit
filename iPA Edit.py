@@ -4,9 +4,7 @@ import zipfile
 import plistlib 
 import shutil
 import subprocess
-import time
 import patoolib
-import requests
 import argparse
 from PIL import Image
 
@@ -29,18 +27,27 @@ parser.add_argument("-d", action="store_true",
                     help="export .dylib(s) that are injected in that iPA")
 parser.add_argument("-s", action="store_true",
                     help="sign iPA(s) with a certificate")
+parser.add_argument("-e", action="store_true",
+                    help=".deb to .iPA (only works if the .deb has a Payload folder, for example Kodi)")
 parser.add_argument("-k", action="store_true",
-                    help="keep source iPA")
+                    help="keep source iPA/deb")
 
 args = parser.parse_args()
-    
-if os.path.exists(args.o) and not args.d and not args.s:
+
+if os.path.isfile(args.o) or os.path.isfile(args.o + '.ipa') or os.path.isfile(args.o + '.deb') and not args.d and not args.s:
     overwrite = input(f"[<] {args.o} already exists. overwrite? [Y/n] ").lower().strip()
     if overwrite in ("y", "yes", ""):
         del overwrite
     else:
         print("[>] quitting")
         sys.exit()
+        
+if os.path.isdir(args.o):
+    input_filename = os.path.basename(args.i)
+    output_path = os.path.join(args.o, input_filename)
+    output_path = output_path[:-4]
+    args.o = output_path
+    print("[*] fixed output path:", output_path)
 
 def unzip_ipa(ipa_path):
     print("[*] extracting iPA")
@@ -48,7 +55,6 @@ def unzip_ipa(ipa_path):
 
     if os.path.exists(ipa_path):
         os.rename(ipa_path, zip_path)
-        time.sleep(1)
     else:
         sys.exit("[!] .iPA file could not be found. Try again...")
 
@@ -87,11 +93,11 @@ def zip_ipa(ipa_path, payload_path):
     shutil.rmtree(payload_path)
 
 
-if not args.s:
+if not args.s and not args.e:
     ipa_path = args.i
     app_path, zip_path, payload_path = unzip_ipa(ipa_path)
 
-if args.n or args.b or args.v or args.k or args.f:
+if args.n or args.b or args.v or args.f:
 
     plist_path = os.path.join(app_path, 'Info.plist')
     with open(plist_path, 'rb') as plist:
@@ -235,12 +241,44 @@ if args.s:
         cmd = f'"{zsign_path}" -k "{p12_path}" -m "{mb_path}" -p "{cert_pw}" -o "{args.o}" -z 9 "{args.i}"'
         subprocess.run(cmd, shell=True)
 
+if args.e:
+    deb_temp = os.path.join(args.o, 'deb_temp')
+    if not os.path.exists(deb_temp):
+        os.makedirs(deb_temp)
+    print("[*] extracting deb")
+    patoolib.extract_archive(args.i, outdir=deb_temp, verbosity=-1)
 
-if not args.d and not args.s:
+    app_folder = os.path.join(deb_temp, 'Applications')
+    
+    if os.path.exists(app_folder) and os.path.isdir(app_folder):
+        for folder in os.listdir(app_folder):
+            if folder.endswith('.app'):
+                print("[*] found app folder")
+                app_folder = os.path.join(app_folder, folder)
+                payload_path = os.path.join(deb_temp, 'Payload')
+                os.makedirs(payload_path, exist_ok=True)
+                print("[*] moving app to payload folder")
+                shutil.copytree(app_folder, os.path.join(payload_path, folder))
+                payload_path = os.path.join(deb_temp, 'Payload')
+                print("[*] generating iPA")
+                shutil.make_archive(args.o, 'zip', os.path.dirname(payload_path), os.path.basename(payload_path))
+                args.o = args.o + '.zip'
+                output_name = args.o.replace('.zip', '.ipa')
+                os.replace(args.o, output_name)
+                if args.k:
+                    print("[*] source deb will not be deleted")
+                else:
+                    os.remove(args.i)
+                dl_path = args.o[:-4]
+                shutil.rmtree(dl_path)
+                # a little bit stupid but yea it works
+                print("[*] deleted temp files")
+            else:
+                print("[!] something went wrong! please make sure this deb has an app folder. if it has and it still fails create a new issue: https://github.com/binnichtaktiv/iPA-Edit/issues")                
+
+if not args.d and not args.s and not args.e:
     zip_ipa(ipa_path, payload_path)
-elif not args.s:
+elif not args.s and not args.e:
     os.rename(zip_path, ipa_path)
     shutil.rmtree(payload_path)
     print("[*] deleted temp files")
-
-    
