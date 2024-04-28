@@ -1,54 +1,54 @@
 # iPA Edit
 
-iPA Edit is a Python script for modifying and resigning iOS IPA files. It allows you to easily change various attributes of an IPA such as the bundle ID, app name, app icon, inject tweaks, and more.
-
-## Features
-
-- Download IPAs directly via URL
-- Change bundle ID
-- Change app name
-- Change app version
-- Change app icon
-- Inject Satella jailbreak  
-- Export .dylib files from IPA
-- Change .dylib dependencies
-- Add hidden cracker name to IPA
-- Sign and upload IPAs in bulk | not working rn
-- Convert .deb to .ipa
-- Enable file sharing
-
-
-## Requirements
-
-- Python 3
-- Azule (for some functions)
-- zsign (for bulk signing) | not working rn
+iPA Edit is a Python script for modifying iPA files. It allows you to easily change various attributes of an IPA such as the bundle ID, app name, app icon, inject tweaks, and more.
 
 ## Installation
 
-1. Install Python 3 if not already installed
+1. **Install Python:** Make sure you have Python installed on your system. If not, you can download and install it from the [official Python website](https://www.python.org/downloads/).
 
-2. Clone this repository:
+2. **Install Dependencies:** Open your terminal or command prompt and run the following command to install the required Python libraries:
 
-3. Install dependencies: ```pip3 install patool requests requests-toolbelt tqdm```
+    ```bash
+    pip install Pillow argparse patoolib
+    ```
 
-4. Install [Azule](https://github.com/Al4ise/Azule) for IPA patching functions
-
-5. Install [zsign](https://github.com/zcutil/zsign) for bulk signing IPAs (not finished)
-
-6. Run the script: ```python3 iPA Edit.py```
-
+3. **Install Zsign (optional):** If you want to sign iPA files, you need to compile `zsign`. This can be done from the [zsign GitHub page](https://github.com/zhlynn/zsign).
 
 ## Usage
 
-Run the script and follow the prompts to choose the desired option. Most options will ask you to provide an IPA file path and make changes as needed.
+Use the script by providing command-line arguments as follows:
 
-- For downloading IPAs, provide a direct URL when prompted
+```bash
+python ipaedit.py -i input.ipa -o output.ipa [Options]
+```
+you can get usage info with `ipaedit.py -h`
 
-- For bulk resigning, provide paths to certificate, mobileprovision, and a folder with IPAs  | not working rn
+```
+usage: iPA Edit beta.py [-h] -i input -o output [-b bundleID] [-n app name] [-v app version]
+                        [-p app icon] [-f] [-d] [-s] [-e] [-k]
 
-- For Azule functions, ensure Azule is installed and in PATH
+iPA Edit is a Python script for modifying iPA files.
 
-The script will output new files to the same folder as the input IPA by default. Provide custom output paths when prompted if needed.
+options:
+  -h, --help      show this help message and exit
+  -i input        the .ipa/.deb to patch
+  -o output       the name of the patched .ipa/.deb that will be created. recommended to specify
+                  not only the output folder but also the name of the output file, e.g.
+                  /home/ipa/mymodiPA.ipa
+  -b bundleID     change bundleID
+  -n app name     change app name
+  -v app version  change app version
+  -p app icon     change app icon
+  -f              enable document browser
+  -d              export .dylib(s) that are injected in that iPA
+  -s              sign iPA(s) with a certificate (If you only want to sign one iPA, enter the
+                  path of the iPA in -i, but if it is a folder with several iPAs, then enter the
+                  folder that contains all the iPAs in -i)
+  -e              .deb to .iPA (only works if the .deb has a Payload folder, for example Kodi)
+  -k              keep source iPA/deb
+```
+If you have suggestions for what else I could add then create an issue or [contact me](https://binnichtaktiv.github.io/contact)
 
-Some options like app name, bundle ID, icon etc. directly modify the IPA plist. Others like Satella injection use Azule to rebuild a new IPA.
+
+
+
