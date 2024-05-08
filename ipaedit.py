@@ -42,7 +42,7 @@ if os.path.isfile(args.o) or os.path.isfile(args.o + '.ipa') or os.path.isfile(a
         print("[>] quitting")
         sys.exit()
         
-if os.path.isdir(args.o):
+if os.path.isdir(args.o) and not args.d:
     input_filename = os.path.basename(args.i)
     output_path = os.path.join(args.o, input_filename)
     output_path = output_path[:-4]
