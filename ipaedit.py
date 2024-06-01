@@ -166,10 +166,14 @@ if args.n or args.b or args.v or args.f:
 
 if args.d:
     dylib_files = []
-    for root, _, files in os.walk(app_path):
+    for root, dirs, files in os.walk(app_path):
         for file in files:
             if file.endswith('.dylib'):
                 dylib_files.append(os.path.join(root, file))
+        for dir in dirs:
+            if dir.endswith('.framework'):
+                dylib_files.append(os.path.join(root, dir))
+                
     if not dylib_files:
         print("[!] no dylibs found")
         
@@ -190,10 +194,24 @@ if args.d:
         shutil.rmtree(payload_path)
         sys.exit("[!] please check your output folder! it doesn't seem to exist\n[*] cleaned up temp files")
 
-    for file in selected_dylibs:
-        shutil.copy(file, args.o)
-    print("[*] exported .dylib(s) successfully")
+    exported_framework = False
+    exported_dylib = False
     
+    for file in selected_dylibs:    
+        if os.path.isdir(file): 
+            destination = os.path.join(args.o, os.path.basename(file))
+            shutil.copytree(file, destination)
+            exported_framework = True
+        else:
+            shutil.copy(file, args.o)
+            exported_dylib = True
+        
+if exported_framework and exported_dylib == True:
+    print("[*] exported .framework(s) and .dylib(s) successfully!")
+elif exported_framework == True:
+    print("[*] exported .framework(s) successfully!")
+else:
+    print("[*] exported .dylib(s) successfully!")
     
 if args.s:
     p12_path = ""
