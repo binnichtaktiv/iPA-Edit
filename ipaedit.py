@@ -95,7 +95,8 @@ def zip_ipa(ipa_path, payload_path):
     if args.k:
         print("[*] source iPA will not be deleted")
     else:
-        os.remove(zip_path)
+        if ipa_path != output_name:
+            os.remove(zip_path)
     shutil.rmtree(payload_path)
 
 
