@@ -8,6 +8,9 @@ import patoolib
 import argparse
 from PIL import Image
 
+exported_framework = False
+exported_dylib = False
+
 parser = argparse.ArgumentParser(description="iPA Edit is a Python script for modifying iPA files.")
 parser.add_argument("-i", metavar="input", type=str, required=True,
                     help="the .ipa/.deb to patch")
