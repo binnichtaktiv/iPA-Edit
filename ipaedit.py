@@ -8,6 +8,9 @@ import patoolib
 import argparse
 from PIL import Image
 
+exported_framework = False
+exported_dylib = False
+
 parser = argparse.ArgumentParser(description="iPA Edit is a Python script for modifying iPA files.")
 parser.add_argument("-i", metavar="input", type=str, required=True,
                     help="the .ipa/.deb to patch")
@@ -34,11 +37,15 @@ parser.add_argument("-k", action="store_true",
 
 args = parser.parse_args()
 
-if os.path.isfile(args.o) or os.path.isfile(args.o + '.ipa') or os.path.isfile(args.o + '.deb') and not args.d and not args.s:
-    overwrite = input(f"[<] {args.o} already exists. overwrite? [Y/n] ").lower().strip()
-    if overwrite in ("y", "yes", ""):
-        del overwrite
+def overwrite_existing_file(file_path):
+    if os.isatty(sys.stdin.fileno()):
+        overwrite = input(f"[<] {file_path} already exists. overwrite? [Y/n] ").lower().strip()
+        return overwrite in ("y", "yes", "")
     else:
+        return os.getenv("OVERWRITE_EXISTING", "Y").lower().strip() == "y"
+
+if os.path.isfile(args.o) or os.path.isfile(args.o + '.ipa') or os.path.isfile(args.o + '.deb') and not args.d and not args.s:
+    if not overwrite_existing_file(args.o):
         print("[>] quitting")
         sys.exit()
         
@@ -88,7 +95,8 @@ def zip_ipa(ipa_path, payload_path):
     if args.k:
         print("[*] source iPA will not be deleted")
     else:
-        os.remove(zip_path)
+        if ipa_path != output_name:
+            os.remove(zip_path)
     shutil.rmtree(payload_path)
 
 
@@ -154,7 +162,7 @@ if args.n or args.b or args.v or args.f:
                 "CFBundleIconName": icon
             }
         }
-        print("[*] changed ap icon")
+        print("[*] changed app icon")
     
     if args.f:
         pl_content['LSSupportsOpeningDocumentsInPlace'] = True
