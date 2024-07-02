@@ -85,6 +85,7 @@ def unzip_ipa(ipa_path):
 def zip_ipa(ipa_path, payload_path):
     
     print("[*] generating iPA...")
+    payload_path = os.path.join(os.getcwd(), "Payload")
     if args.o.endswith('.ipa'):
         args.o = args.o[:-4]
     shutil.make_archive(args.o, 'zip', os.path.dirname(payload_path), os.path.basename(payload_path))
@@ -214,12 +215,12 @@ if args.d:
             shutil.copy(file, args.o)
             exported_dylib = True
         
-if exported_framework and exported_dylib == True:
-    print("[*] exported .framework(s) and .dylib(s) successfully!")
-elif exported_framework == True:
-    print("[*] exported .framework(s) successfully!")
-else:
-    print("[*] exported .dylib(s) successfully!")
+    if exported_framework and exported_dylib == True:
+        print("[*] exported .framework(s) and .dylib(s) successfully!")
+    elif exported_framework == True:
+        print("[*] exported .framework(s) successfully!")
+    else:
+        print("[*] exported .dylib(s) successfully!")
     
 if args.s:
     p12_path = ""
