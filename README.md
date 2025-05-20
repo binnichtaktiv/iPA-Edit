@@ -47,7 +47,9 @@ options:
   -e              .deb to .iPA (only works if the .deb has a Payload folder, for example Kodi)
   -k              keep source iPA/deb
 ```
-If you have suggestions for what else I could add then create an issue or [contact me](https://binnichtaktiv.github.io/contact)
+If you have suggestions for what else I could add then create an issue or [contact me](https://binnichtaktiv.github.io)
+
+[![Stargazers over time](https://starchart.cc/binnichtaktiv/iPA-Edit.svg?variant=adaptive)](https://starchart.cc/binnichtaktiv/iPA-Edit)
 
 
 
